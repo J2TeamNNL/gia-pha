@@ -5,9 +5,9 @@
 - Phân tích các mã nguồn mở về gia phả để rút ra bài học.
 - Chốt tech stack (PWA installable app, React/Next.js/Vue, Google Drive API, Local DB).
 - Thiết kế Data Modeling (hỗ trợ song ngữ Anh-Việt, tách rõ phần First Name / Last Name / Middle Name).
-- Thiết kế UI/UX và logic vẽ sơ đồ cây tối ưu.
-- Lên cấu trúc backend "mỏng" nhất có thể (nếu cần thiết cho tính năng chia sẻ sau này).
-- Triển khai MVP.
+- Thiết kế Data Modeling nâng cao: Hỗ trợ đa thê/đa phu, lưu location Google Maps cho từng thành viên, phân loại con (đẻ, rể, dâu).
+- Lên lộ trình phát triển thành 3 Phase: **MVP**, **Văn Hóa (V2)**, và **Mạng Xã Hội Gia Đình (V3)**.
+- Triển khai **Version 1 (MVP)** với cấu trúc core: Auth (Google), Google Drive Sync, Local SQLite, Vẽ sơ đồ.
 
 ## 2. Tasks
 
@@ -16,7 +16,8 @@
 - [x] Phân tích ưu/nhược điểm của repo: `giapha-os`.
 - [x] Phân tích ưu/nhược điểm của repo: `AncestorTree`.
 - [x] Chốt công nghệ và Data Schema (có hỗ trợ PWA và Google Drive sync).
-- [ ] Khởi tạo bộ khung dự án.
+- [ ] Khảo sát thư viện OCR (Tesseract.js) để scan CCCD và Google Photos API (cho Phase 3).
+- [ ] Khởi tạo bộ khung dự án MVP (Next.js + sql.js).
 
 ## 3. Flow
 
