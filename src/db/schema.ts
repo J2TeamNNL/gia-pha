@@ -39,6 +39,8 @@ export const initDatabaseSchema = (db: any) => {
       biography TEXT,
       notes TEXT,
 
+      is_anchor INTEGER DEFAULT 0, -- 1 = this is the base person ("bản thân") for computing danh xưng
+
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );

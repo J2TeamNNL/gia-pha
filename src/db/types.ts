@@ -27,6 +27,7 @@ export interface Person {
   avatar_url?: string;
   biography?: string;
   notes?: string;
+  is_anchor?: boolean; // true = this person is the reference point for danh xưng
 }
 
 export type RelationshipType =
