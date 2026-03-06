@@ -26,7 +26,7 @@ export default function Home() {
           <span className="font-bold font-serif text-lg text-stone-800 tracking-tight">
             {t.appName}
           </span>
-          <span className="text-xs px-2 py-0.5 bg-stone-100 text-stone-500 rounded-full border border-stone-200 font-medium">
+          <span className="hidden sm:inline-block text-xs px-2 py-0.5 bg-stone-100 text-stone-500 rounded-full border border-stone-200 font-medium">
             {t.appTagline}
           </span>
         </div>
@@ -56,7 +56,7 @@ export default function Home() {
               className="flex items-center gap-1.5 bg-stone-800 hover:bg-stone-700 text-white text-sm font-medium px-4 py-2 rounded-full transition-colors shadow-sm"
             >
               <Plus className="size-4" />
-              {t.header.addMember}
+              <span className="hidden sm:inline">{t.header.addMember}</span>
             </button>
           )}
           <button className="flex items-center gap-1.5 border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-sm px-4 py-2 rounded-full transition-colors">

@@ -1,14 +1,21 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { X } from "lucide-react";
 import { useTreeStore } from "@/store/treeStore";
 import { useTranslation } from "@/i18n/useTranslation";
 import { QuickAddForm } from "./QuickAddForm";
 import { cn } from "@/lib/utils";
 
 export function SidePanel() {
-  const { isFormOpen, closeForm, selectedPersonId, persons, locale } =
-    useTreeStore();
+  const {
+    isFormOpen,
+    closeForm,
+    selectedPersonId,
+    selectPerson,
+    persons,
+    locale,
+  } = useTreeStore();
   const t = useTranslation();
   const selectedPerson = persons.find((p) => p.id === selectedPersonId);
   const showPanel = isFormOpen || !!selectedPerson;
@@ -22,14 +29,20 @@ export function SidePanel() {
           animate={{ x: 0 }}
           exit={{ x: "100%" }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="w-full sm:w-80 lg:w-96 bg-white border-l border-stone-200 shadow-xl flex flex-col overflow-y-auto"
+          className="absolute inset-y-0 right-0 z-40 sm:relative w-full sm:w-80 lg:w-96 bg-white border-l border-stone-200 shadow-xl flex flex-col overflow-y-auto"
         >
           <div className="p-5 flex-1">
             {isFormOpen ? (
               <QuickAddForm onClose={closeForm} />
             ) : selectedPerson ? (
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 pb-4 border-b border-stone-100">
+              <div className="space-y-4 relative">
+                <button
+                  onClick={() => selectPerson(null)}
+                  className="absolute top-0 right-0 p-1.5 text-stone-400 hover:text-stone-600 bg-stone-50 hover:bg-stone-100 rounded-full transition-colors"
+                >
+                  <X className="size-4" />
+                </button>
+                <div className="flex items-center gap-3 pb-4 border-b border-stone-100 pr-8">
                   <div
                     className={cn(
                       "size-14 rounded-full flex items-center justify-center text-white font-bold text-lg bg-gradient-to-br shadow-inner",

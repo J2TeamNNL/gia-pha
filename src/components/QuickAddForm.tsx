@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTreeStore } from "@/store/treeStore";
-import { createPerson } from "@/db/persons";
+import { createPerson, createRelationship } from "@/db/persons";
 import type { Gender } from "@/db/types";
 import { cn } from "@/lib/utils";
 import { PhoneInput } from "./PhoneInput";
@@ -25,6 +25,8 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
     openForm,
     persons,
     anchorPersonId,
+    formPreFill,
+    addRelationship,
   } = useTreeStore();
 
   const [lastName, setLastName] = useState("");
@@ -79,6 +81,52 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
         notes: note.trim() || undefined,
       });
       addPerson(newPerson);
+
+      // Add relationship if prefilled
+      if (formPreFill) {
+        let rel1, rel2;
+        switch (formPreFill.relType) {
+          case "parent":
+            // newPerson is parent of targetId
+            rel1 = await createRelationship(
+              newPerson.id,
+              formPreFill.targetId,
+              "PARENT_OF",
+            );
+            break;
+          case "child":
+            // targetId is parent of newPerson
+            rel1 = await createRelationship(
+              formPreFill.targetId,
+              newPerson.id,
+              "PARENT_OF",
+            );
+            break;
+          case "spouse":
+            rel1 = await createRelationship(
+              newPerson.id,
+              formPreFill.targetId,
+              "SPOUSE",
+            );
+            rel2 = await createRelationship(
+              formPreFill.targetId,
+              newPerson.id,
+              "SPOUSE",
+            );
+            break;
+          case "sibling":
+            // Sibling relationships are implicit through shared parents in standard genealogy,
+            // but for a quick MVP we might just want them linked if we don't have parents yet.
+            // Leaving unimplemented in DB for now to avoid schema drift, or could add "SIBLING" to types.ts later.
+            console.warn(
+              "Sibling direct relationship not yet supported by DB schema.",
+            );
+            break;
+        }
+        if (rel1) addRelationship(rel1);
+        if (rel2) addRelationship(rel2);
+      }
+
       if (phoneLocal.trim()) trackFieldUsage("phone_number");
       onClose();
     } catch (err) {
@@ -98,7 +146,13 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-stone-700">
           <User className="size-4" />
-          <span className="font-semibold text-base">Thêm thành viên</span>
+          <span className="font-semibold text-base">
+            {!formPreFill && "Thêm thành viên"}
+            {formPreFill?.relType === "parent" && "Thêm cha/mẹ"}
+            {formPreFill?.relType === "child" && "Thêm con cái"}
+            {formPreFill?.relType === "spouse" && "Thêm vợ/chồng"}
+            {formPreFill?.relType === "sibling" && "Thêm anh/chị/em"}
+          </span>
         </div>
         <button
           type="button"

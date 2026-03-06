@@ -11,6 +11,7 @@ Website quản lý gia phả với mục tiêu bảo mật tối đa, dễ dàng
 - **Quản lý thông tin chi tiết**: Avatar, Facebook, SĐT, địa chỉ (tích hợp Google Maps chỉ đường tới nhà).
 - **Quản lý quan hệ phức tạp**: Hỗ trợ đa thê/đa phu (1 chồng nhiều vợ và ngược lại), phân biệt rõ con đẻ, con rể, con dâu.
 - **Gợi ý đặt tên con**: Tính năng tra cứu cây gia phả để phòng tránh đặt tên con cháu trùng với các bậc trưởng bối đời trước.
+- **Tử Vi & Lịch Kỵ**: Đề xuất tên cho con, cảnh báo ngày kỵ (cưới hỏi, sinh nở, động thổ…) dựa trên tử vi, lá số. Chủ yếu gợi ý tránh ngày xấu, không khuyến khích mê tín dị đoan.
 - **Tính toán danh xưng**: Tự động xác định cách xưng hô chuẩn xác giữa các thành viên.
 - **Tiện ích nhập liệu**: Hỗ trợ quét thẻ Căn cước công dân (CCCD/ID Card) để điền thông tin tự động nhanh chóng.
 - **Calendar & Văn hóa Việt Nam**: Tích hợp Căn Chi (Giáp Tý, Ất Sửu) để lưu trữ bổ sung. Đồng thời đồng bộ nhắc nhở Sinh nhật, Ngày giỗ (Âm/Dương) vào Google Calendar của người dùng.

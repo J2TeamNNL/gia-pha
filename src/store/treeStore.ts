@@ -14,6 +14,10 @@ interface TreeState {
   anchorPersonId: string | null;
   isFormOpen: boolean;
   formMode: "quick" | "full";
+  formPreFill: {
+    targetId: string;
+    relType: "parent" | "child" | "spouse" | "sibling";
+  } | null;
   isOnboarding: boolean;
   locale: Locale;
 
@@ -26,7 +30,13 @@ interface TreeState {
   setRelationships: (rels: Relationship[]) => void;
   addRelationship: (rel: Relationship) => void;
   selectPerson: (id: string | null) => void;
-  openForm: (mode?: "quick" | "full") => void;
+  openForm: (
+    mode?: "quick" | "full",
+    preFill?: {
+      targetId: string;
+      relType: "parent" | "child" | "spouse" | "sibling";
+    },
+  ) => void;
   closeForm: () => void;
   setAnchorPersonId: (id: string | null) => void;
   setLocale: (locale: Locale) => void;
@@ -41,6 +51,7 @@ export const useTreeStore = create<TreeState>()(
       selectedPersonId: null,
       anchorPersonId: null,
       isFormOpen: false,
+      formPreFill: null,
       isOnboarding: true,
       formMode: "quick",
       locale: "vi",
@@ -69,8 +80,9 @@ export const useTreeStore = create<TreeState>()(
         set((s) => ({ relationships: [...s.relationships, rel] })),
 
       selectPerson: (id) => set({ selectedPersonId: id }),
-      openForm: (mode = "quick") => set({ isFormOpen: true, formMode: mode }),
-      closeForm: () => set({ isFormOpen: false }),
+      openForm: (mode = "quick", preFill) =>
+        set({ isFormOpen: true, formMode: mode, formPreFill: preFill || null }),
+      closeForm: () => set({ isFormOpen: false, formPreFill: null }),
       setAnchorPersonId: (id) =>
         set({ anchorPersonId: id, isOnboarding: false }),
       setLocale: (locale) => set({ locale }),

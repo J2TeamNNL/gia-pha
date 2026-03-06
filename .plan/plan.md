@@ -12,12 +12,27 @@
 ## 2. Tasks
 
 - [x] Clone các repo tham khảo vào thư mục `references`.
-- [x] Phân tích ưu/nhược điểm của repo: `Gia-Pha-Dien-Tu`.
-- [x] Phân tích ưu/nhược điểm của repo: `giapha-os`.
-- [x] Phân tích ưu/nhược điểm của repo: `AncestorTree`.
+- [x] Phân tích ưu/nhược điểm của các repo tham khảo.
 - [x] Chốt công nghệ và Data Schema (có hỗ trợ PWA và Google Drive sync).
-- [ ] Khảo sát thư viện OCR (Tesseract.js) để scan CCCD và Google Photos API (cho Phase 3).
-- [ ] Khởi tạo bộ khung dự án MVP (Next.js + sql.js).
+- [x] Khởi tạo bộ khung dự án MVP (Next.js + sql.js).
+- [x] Onboarding Screen: Tách riêng Họ/Tên đệm/Tên + Autofill + Phone (+84).
+- [x] Đa ngôn ngữ (i18n): VI/EN labels, chọn ngôn ngữ trên Header.
+- [x] Sửa lỗi NOT NULL constraint và SQLite Caching bug.
+- [x] Sửa lỗi "Empty Tree" sau Onboarding (sql.js minification bug).
+- [x] Redesign PersonCard: Glassmorphism, soft shadow, ring borders.
+- [x] Redesign FamilyTreeCanvas: Infinite panning, CSS tree connectors.
+- [x] Nút (+) Thêm Nhánh Trực Tiếp: Thêm Cha/Mẹ, Con, Vợ/Chồng, Anh Chị Em.
+- [x] Auto-create Relationship khi thêm từ nút (+).
+- [x] Responsive Mobile UI: Header & SidePanel.
+- [/] Cập nhật `.plan/plan.md` và duy trì single source of truth.
+- [ ] Gợi ý Họ tự động cho người mới (từ gia phả hiện có).
+- [ ] Tính toán danh xưng tự động.
+- [ ] Google Drive Sync (lưu/tải file SQLite lên Drive API).
+- [ ] **Tử Vi / Bói Toán**: Đề xuất tên cho con, ngày cưới/sinh. Cảnh báo ngày kỵ, tránh mê tín.
+- [ ] Quét CCCD/Hộ khẩu (Tesseract OCR) để tự động điền thông tin.
+- [ ] Import/Export CSV, GEDCOM.
+- [ ] Tích hợp Google Calendar nhắc Sinh nhật, Ngày giỗ.
+- [ ] Xuất sơ đồ cây ra file ảnh (PNG/PDF).
 
 ## 3. Flow
 
@@ -31,4 +46,24 @@
 
 ## 4. Changelog
 
-- **2026-02-28**: Khởi tạo file `.plan`. Tải bộ source tham khảo (`Gia-Pha-Dien-Tu`, `giapha-os`, `AncestorTree`).
+### [0.3.0] - 2026-03-06
+
+- **Added**: Nút (+) Thêm Nhánh Trực Tiếp (Top, Bottom, Left, Right).
+- **Added**: Auto-create Relationship & Dynamic Form Header.
+- **Changed**: Redesign PersonCard (Glassmorphism) & FamilyTreeCanvas (Infinite panning, CSS connectors).
+
+### [0.2.0] - 2026-03-05
+
+- **Fixed**: Lỗi NOT NULL constraint & Empty Tree (sql.js browser binding/minification).
+- **Added**: Responsive Mobile UI, i18n (VI/EN), Gợi ý Họ (Autocomplete).
+- **Changed**: Onboarding Form tách riêng Họ/Tên đệm/Tên.
+
+### [0.1.0] - 2026-03-04
+
+- Khởi tạo dự án Next.js PWA + sql.js.
+- Database Schema: `persons` (25 fields), `relationships`.
+- Onboarding Screen MVP.
+
+### **2026-02-28**
+
+- Khởi tạo file `.plan`. Tải bộ source tham khảo.
