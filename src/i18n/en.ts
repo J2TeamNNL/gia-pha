@@ -9,8 +9,14 @@ export const en: Dictionary = {
 
   header: {
     addMember: "Add Member",
-    signInGoogle: "Sign in with Google",
-    installPwa: "Install App",
+    treeCatalog: "Family tree catalog",
+  },
+
+  search: {
+    placeholder: "Search members…",
+    label: "Search members",
+    noResults: "No members found.",
+    clear: "Clear search",
   },
 
   onboarding: {
@@ -70,6 +76,8 @@ export const en: Dictionary = {
     note: "📝 Notes",
     biography: "📖 Biography",
     setAsAnchor: "Set as center",
+    anchorBadge: "You",
+    closePanel: "Close details panel",
   },
 
   personCard: {

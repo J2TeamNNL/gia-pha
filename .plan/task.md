@@ -13,7 +13,7 @@ Status values: `TODO`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `SUPERSEDED`.
 | FND-003 | DONE | P0 | Implement multi-tree catalog | Users can create, rename, open, and delete isolated trees; destructive actions require confirmation. |
 | DOM-001 | DONE | P0 | Implement domain schema and migrations | Constraints and transactions cover people, unions, partners, children, dates, provenance, and schema versions. |
 | DOM-002 | DONE | P0 | Implement genealogy validation | Reject self-links, duplicate memberships, invalid parent cycles, and dangling references with actionable errors. |
-| UI-001 | TODO | P0 | Build workspace and editor shell | Mobile/desktop workspace, search, side panel, and reference-person selection are keyboard accessible. |
+| UI-001 | DONE | P0 | Build workspace and editor shell | Mobile/desktop workspace, search, side panel, and reference-person selection are keyboard accessible. |
 | UI-002 | TODO | P0 | Build graph rendering | Correct union/parent-child graph, focus/depth controls, pan/zoom, worker layout, and 500-visible-node guard. |
 | IO-001 | TODO | P0 | Publish Native JSON v1 | Versioned JSON Schema, validator, deterministic export, and import/export round-trip tests exist. |
 | IO-002 | TODO | P0 | Implement GEDCOM adapters | Supported versions import/export with fixtures; unknown extensions survive or appear in a loss report. |

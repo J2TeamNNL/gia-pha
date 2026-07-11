@@ -1,9 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { Star, X } from "lucide-react";
 import { useTreeStore } from "@/store/treeStore";
 import { useTranslation } from "@/i18n/useTranslation";
+import { setAnchorPerson } from "@/db/persons";
 import { QuickAddForm } from "./QuickAddForm";
 import { cn } from "@/lib/utils";
 
@@ -14,11 +16,35 @@ export function SidePanel() {
     selectedPersonId,
     selectPerson,
     persons,
-    locale,
+    setPersons,
+    setAnchorPersonId,
   } = useTreeStore();
   const t = useTranslation();
+  const [anchorError, setAnchorError] = useState<string>();
   const selectedPerson = persons.find((p) => p.id === selectedPersonId);
   const showPanel = isFormOpen || !!selectedPerson;
+
+  useEffect(() => {
+    if (!showPanel) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      if (isFormOpen) closeForm();
+      else selectPerson(null);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [showPanel, isFormOpen, closeForm, selectPerson]);
+
+  const makeAnchor = async (id: string) => {
+    setAnchorError(undefined);
+    try {
+      await setAnchorPerson(id);
+      setPersons(persons.map((p) => ({ ...p, is_anchor: p.id === id })));
+      setAnchorPersonId(id);
+    } catch (error) {
+      setAnchorError(error instanceof Error ? error.message : String(error));
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -38,6 +64,7 @@ export function SidePanel() {
               <div className="space-y-4 relative">
                 <button
                   onClick={() => selectPerson(null)}
+                  aria-label={t.profile.closePanel}
                   className="absolute top-0 right-0 p-1.5 text-stone-400 hover:text-stone-600 bg-stone-50 hover:bg-stone-100 rounded-full transition-colors"
                 >
                   <X className="size-4" />
@@ -85,11 +112,27 @@ export function SidePanel() {
                     </span>
                     {selectedPerson.is_anchor && (
                       <span className="ml-1 text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
-                        ⭐ {locale === "vi" ? "Bản thân" : "You"}
+                        ⭐ {t.profile.anchorBadge}
                       </span>
                     )}
                   </div>
                 </div>
+
+                {!selectedPerson.is_anchor && (
+                  <button
+                    type="button"
+                    onClick={() => makeAnchor(selectedPerson.id)}
+                    className="w-full flex items-center justify-center gap-2 border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800 text-sm font-medium px-4 py-2 rounded-full transition-colors"
+                  >
+                    <Star className="size-4" />
+                    {t.profile.setAsAnchor}
+                  </button>
+                )}
+                {anchorError && (
+                  <p role="alert" className="text-xs text-red-600">
+                    {anchorError}
+                  </p>
+                )}
 
                 <div className="space-y-3 text-sm">
                   {selectedPerson.phone_number && (

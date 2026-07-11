@@ -4,7 +4,16 @@
 export interface Dictionary {
   appName: string;
   appTagline: string;
-  header: { addMember: string; signInGoogle: string; installPwa: string };
+  header: {
+    addMember: string;
+    treeCatalog: string;
+  };
+  search: {
+    placeholder: string;
+    label: string;
+    noResults: string;
+    clear: string;
+  };
   onboarding: {
     title: string;
     subtitle: string;
@@ -56,6 +65,8 @@ export interface Dictionary {
     note: string;
     biography: string;
     setAsAnchor: string;
+    anchorBadge: string;
+    closePanel: string;
   };
   personCard: { deceased: string };
 }
@@ -70,8 +81,15 @@ export const vi: Dictionary = {
   // Header
   header: {
     addMember: "Thêm thành viên",
-    signInGoogle: "Đăng nhập Google",
-    installPwa: "Cài đặt App",
+    treeCatalog: "Danh sách cây gia phả",
+  },
+
+  // Search
+  search: {
+    placeholder: "Tìm thành viên…",
+    label: "Tìm kiếm thành viên",
+    noResults: "Không tìm thấy thành viên nào.",
+    clear: "Xóa tìm kiếm",
   },
 
   // Onboarding
@@ -136,6 +154,8 @@ export const vi: Dictionary = {
     note: "📝 Ghi chú",
     biography: "📖 Tiểu sử",
     setAsAnchor: "Đặt làm trung tâm",
+    anchorBadge: "Bản thân",
+    closePanel: "Đóng bảng thông tin",
   },
 
   personCard: {

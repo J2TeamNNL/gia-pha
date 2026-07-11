@@ -176,6 +176,49 @@ This log records both implementation and durable documentation changes. Dates us
 - `src/db/validation.test.ts`
 - `src/db/persons.ts`
 
+## 2026-07-12 - Review fixes for the runtime migration
+
+**What**
+
+- Fixed review findings on the Vite/OPFS migration diff: NOT NULL `is_anchor` insert failure in quick-add, per-connection `PRAGMA foreign_keys` never set on already-migrated trees, ancestor cycles undetected through `ADOPTED_PARENT_OF`, non-active tree deletion wiping the open tree's state, missing rollback when an OPFS delete fails, and worker crashes leaving all future DB calls hanging.
+- Converted `persons.ts` to parameterized queries, extracted the shared worker message protocol into `src/db/protocol.ts`, removed the no-op flush round-trip and debug logging, merged duplicated validation and OPFS helpers, added relationship indexes as schema migration 3, and removed the unused `next-themes` dependency plus dead `test-exec.js`.
+
+**Why**
+
+- The migration diff introduced correctness bugs that broke core flows (adding a member) and silently disabled referential integrity.
+
+**Impact**
+
+- Quick-add works; FK constraints are enforced on every connection; tree deletion and worker failures fail safe. Pre-rewrite IndexedDB prototype data has no migration path (accepted: the old runtime was never released).
+
+**References**
+
+- `src/db/persons.ts`, `src/db/schema.ts`, `src/db/validation.ts`, `src/db/protocol.ts`, `src/db/client.ts`, `src/db/sqlite.worker.ts`
+
+## 2026-07-12 - UI-001 workspace and editor shell
+
+**What**
+
+- Added diacritic-insensitive member search as an accessible combobox (arrow/Enter/Escape keyboard navigation, ARIA listbox) in the workspace header.
+- Added a "Đặt làm trung tâm" reference-person action to the side panel; Escape now closes the panel/form, and icon-only controls gained accessible labels.
+- Removed the dead Google sign-in button (no login exists in the core product).
+
+**Why**
+
+- The workspace shell must offer search and reference-person selection that are keyboard accessible per the UX workflow targets.
+
+**Impact**
+
+- Members are findable by unaccented queries at any tree size shown, and the reference person can be changed from any selected profile. Unit tests cover search normalization; the browser test covers search, keyboard selection, anchor change, and Escape.
+
+**References**
+
+- `task.md` (UI-001)
+- `src/components/SearchBox.tsx`
+- `src/components/SidePanel.tsx`
+- `src/app/page.tsx`
+- `e2e/home.spec.ts`
+
 ## Legacy prototype history
 
 Earlier implementation notes remain available through Git history and the existing analysis files. Their feature-completion claims are not authoritative; verify against code and the legacy review.
