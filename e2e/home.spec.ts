@@ -73,3 +73,29 @@ test("searches members by unaccented text and selects the reference person via k
   await page.keyboard.press("Escape");
   await expect(page.getByRole("button", { name: "Đóng bảng thông tin" })).not.toBeVisible();
 });
+
+test("renders the family graph with relatives added from a card", async ({ page }) => {
+  await page.goto("/");
+  await expect.poll(() => page.evaluate(() => crossOriginIsolated)).toBe(true);
+
+  await page.getByLabel("Tên cây gia phả mới").fill("Cây Sơ Đồ");
+  await page.getByRole("button", { name: "Tạo cây" }).click();
+  await page.locator("#ob-first").fill("Nguyễn Tâm");
+  await page.getByRole("button", { name: "Bắt đầu" }).click();
+  await expect(page.getByText("Nguyễn Tâm", { exact: true })).toBeVisible();
+
+  // Select the card, add a parent through the directional button.
+  await page.getByRole("button", { name: "Nguyễn Tâm" }).click();
+  await page.getByTitle("Thêm cha mẹ").click();
+  await page.getByPlaceholder("vd: An / John").fill("Nguyễn Cha");
+  await page.getByRole("button", { name: "Lưu thành viên" }).click();
+  await expect(page.getByText("Nguyễn Cha", { exact: true })).toBeVisible();
+
+  // Graph controls are present and usable.
+  await expect(page.getByLabel("Số thế hệ hiển thị")).toBeVisible();
+  await page.getByRole("button", { name: "Phóng to" }).click();
+  await page.getByRole("button", { name: "Thu nhỏ" }).click();
+  await page.getByRole("button", { name: "Vừa khung nhìn" }).click();
+  await expect(page.getByRole("button", { name: /Nguyễn Cha/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Nguyễn Tâm/ })).toBeVisible();
+});

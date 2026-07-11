@@ -56,6 +56,15 @@ export interface Dictionary {
     membersCount: string;
     relationships: string;
   };
+  graph: {
+    zoomIn: string;
+    zoomOut: string;
+    fitView: string;
+    depthLabel: string;
+    depthAll: string;
+    focusSelected: string;
+    hiddenNotice: string;
+  };
   profile: {
     alive: string;
     deceased: string;
@@ -142,6 +151,17 @@ export const vi: Dictionary = {
     addFirst: "Thêm thành viên đầu tiên",
     membersCount: "thành viên",
     relationships: "mối quan hệ",
+  },
+
+  // Graph controls
+  graph: {
+    zoomIn: "Phóng to",
+    zoomOut: "Thu nhỏ",
+    fitView: "Vừa khung nhìn",
+    depthLabel: "Số thế hệ hiển thị",
+    depthAll: "Tất cả",
+    focusSelected: "Tập trung vào người đang chọn",
+    hiddenNotice: "{count} thành viên đang ẩn do giới hạn hiển thị",
   },
 
   // Profile panel

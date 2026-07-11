@@ -67,6 +67,16 @@ export const en: Dictionary = {
     relationships: "relationships",
   },
 
+  graph: {
+    zoomIn: "Zoom in",
+    zoomOut: "Zoom out",
+    fitView: "Fit to view",
+    depthLabel: "Generations shown",
+    depthAll: "All",
+    focusSelected: "Focus on selected person",
+    hiddenNotice: "{count} members hidden by the display limit",
+  },
+
   profile: {
     alive: "Living",
     deceased: "Deceased",

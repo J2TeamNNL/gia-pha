@@ -239,6 +239,31 @@ This log records both implementation and durable documentation changes. Dates us
 - `README.md`
 - `overview.md`
 
+## 2026-07-12 - UI-002 family graph rendering
+
+**What**
+
+- Added a layered family-graph layout (generations by BFS from the focus person, partners adjacent, children hanging from the parents' midpoint) computed in a dedicated layout Web Worker.
+- Added pan (pointer drag/arrow keys), cursor-anchored wheel zoom, zoom/fit buttons, a generation-depth selector, focus-on-selected control, and a visible notice when the 500-node guard or depth filter hides people.
+- SVG edges distinguish couples (solid), divorce (dashed), and adoptive parentage (dashed drop lines). The canvas keeps its empty state and now renders the real relationship graph instead of a flat row.
+
+**Why**
+
+- The prototype canvas ignored relationship data; the target UX requires a focused, navigable graph that stays responsive at large tree sizes.
+
+**Impact**
+
+- The graph reflects unions and parent-child structure with keyboard-accessible controls. Layout unit tests cover generations, couple/adoption edges, depth filtering, the 500-node guard, and stale-focus fallback; a browser test covers adding a parent from a card and using the controls.
+
+**References**
+
+- `task.md` (UI-002)
+- `src/graph/layout.ts`
+- `src/graph/layout.worker.ts`
+- `src/graph/useGraphLayout.ts`
+- `src/components/GraphView.tsx`
+- `e2e/home.spec.ts`
+
 ## Legacy prototype history
 
 Earlier implementation notes remain available through Git history and the existing analysis files. Their feature-completion claims are not authoritative; verify against code and the legacy review.
