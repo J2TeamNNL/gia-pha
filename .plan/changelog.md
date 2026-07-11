@@ -219,6 +219,26 @@ This log records both implementation and durable documentation changes. Dates us
 - `src/app/page.tsx`
 - `e2e/home.spec.ts`
 
+## 2026-07-12 - Roadmap realignment with the original vision
+
+**What**
+
+- Restored the founder's original feature list (Drive sync, PWA, danh xưng, lunar calendar/Can Chi/ngày giỗ + Google Calendar, child-name suggestions, tử vi/lịch kỵ, CCCD OCR, image export, Google Photos, Google Maps) to the README and overview as the confirmed post-MVP roadmap.
+- Confirmed with the founder: core MVP stays local-only (Drive sync in Future), GEDCOM stays in Future, the family-social-network V3 idea is dropped from the official roadmap for now.
+
+**Why**
+
+- A previous documentation rewrite replaced the original README vision without recording which ideas were deferred versus dropped; each idea has now been explicitly confirmed.
+
+**Impact**
+
+- No runtime change. MVP scope is unchanged: workspace/graph/JSON/privacy tasks continue.
+
+**References**
+
+- `README.md`
+- `overview.md`
+
 ## Legacy prototype history
 
 Earlier implementation notes remain available through Git history and the existing analysis files. Their feature-completion claims are not authoritative; verify against code and the legacy review.

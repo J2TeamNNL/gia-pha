@@ -30,12 +30,22 @@ The hosted website distributes static application assets only. Family data is cr
 
 - Local workspace, family graph, CRUD, search, native JSON, GEDCOM, diagnostics, tests.
 
-### Future
+### Future (confirmed roadmap, 2026-07-12)
 
-- Optional Google Drive backup/sync.
-- Manual source linking and reviewed delta updates between trees.
-- Merge suggestions with human approval and rollback.
-- PWA installation/offline asset cache, Vietnamese kinship, lunar calendar, OCR, media, and additional import adapters.
+The founder's original feature list is the official post-MVP roadmap:
+
+- Google Drive backup/sync (data lives in the user's own Drive).
+- PWA installation/offline asset cache.
+- Vietnamese kinship terms computed from the reference person (danh xưng).
+- Lunar calendar with Can Chi, birthday/death-anniversary (ngày giỗ) reminders, Google Calendar sync.
+- Child-name suggestions that avoid ancestor name clashes.
+- Tử vi / lịch kỵ date warnings (advisory only, no superstition push).
+- CCCD/ID-card scanning (OCR) for fast data entry.
+- Export the tree diagram as an image.
+- Google Photos embedding per person (open question: embedded media vs. Native JSON export portability).
+- Google Maps directions to member addresses.
+- GEDCOM import/export and additional adapters.
+- Manual source linking, reviewed delta updates, merge suggestions with human approval and rollback.
 
 ### Explicitly not planned for core
 
