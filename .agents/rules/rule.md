@@ -2,18 +2,11 @@
 trigger: model_decision
 ---
 
-# Project Management & Tracking Rule
+# Project Knowledge and Tracking Rule
 
 **Crucial Instruction for all AI Agents:**
 
-You MUST ALWAYS read and append updates to the tracking files located in the `/.plan/` directory.
-These files include:
-
-- `/.plan/plan.md`
-- `/.plan/flow.md`
-- `/.plan/task.md`
-- `/.plan/overview.md`
-- `/.plan/changelog.md`
+You MUST use `/.plan/README.md` as the entrypoint and source-of-truth map.
 
 ## Goals:
 
@@ -23,9 +16,10 @@ These files include:
 
 ## Workflow:
 
-- **At the start of a session:** Read `overview.md`, `plan.md`, `task.md`, and `flow.md` to understand current context and pending tasks.
+- **At the start of a session:** Read `.plan/README.md`, `overview.md`, `task.md`, and all ADRs relevant to the requested work.
 - **During the task:** Update `task.md` to reflect in-progress items.
 - **When finishing a task or session:**
-  - Append completed items and new discoveries to the relevant files.
-  - Update `changelog.md` with a summary of what was accomplished.
+  - Append completed items and discoveries to the relevant files.
+  - Update `changelog.md` with What, Why, Impact, and References.
   - Ensure the high-level `overview.md` and `plan.md` still accurately reflect the project state.
+  - Never describe TARGET or FUTURE behavior as CURRENT implementation.

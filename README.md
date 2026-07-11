@@ -1,29 +1,30 @@
-# Gia Phả - Local First Web App
+# Gia Phả
 
-Website quản lý gia phả với mục tiêu bảo mật tối đa, dễ dàng sử dụng và lưu trữ dữ liệu tại cá nhân người dùng.
+Repository `gia-pha` là nơi phát triển chính thức của ứng dụng gia phả local-first **Gia Phả**. Các phần prototype hiện có sẽ được thay thế từng phần ngay trong repository này theo kiến trúc đích đã được ghi nhận trong `.plan/`.
 
-## Tính năng chính (Dự kiến)
+## CURRENT — Trạng thái hiện tại
 
-- **Local-first & Cloud Sync**: Toàn bộ nội dung gia phả được lưu trực tiếp trên Google Drive lưu trữ cá nhân của người dùng, không phụ thuộc vào Database server.
-- **PWA Ready**: Có thể cài đặt trên các thiết bị di động (Android, iOS) dưới dạng ứng dụng độc lập.
-- **Đa ngôn ngữ & Cấu trúc chuẩn**: Hỗ trợ tiếng Việt và tiếng Anh. Quản lý hệ thống tên gọi theo chuẩn quốc tế (chia First name, Last name, Nickname).
-- **Vẽ sơ đồ trực quan**: Sơ đồ cây mượt mà, dễ dàng tương tác.
-- **Quản lý thông tin chi tiết**: Avatar, Facebook, SĐT, địa chỉ (tích hợp Google Maps chỉ đường tới nhà).
-- **Quản lý quan hệ phức tạp**: Hỗ trợ đa thê/đa phu (1 chồng nhiều vợ và ngược lại), phân biệt rõ con đẻ, con rể, con dâu.
-- **Gợi ý đặt tên con**: Tính năng tra cứu cây gia phả để phòng tránh đặt tên con cháu trùng với các bậc trưởng bối đời trước.
-- **Tử Vi & Lịch Kỵ**: Đề xuất tên cho con, cảnh báo ngày kỵ (cưới hỏi, sinh nở, động thổ…) dựa trên tử vi, lá số. Chủ yếu gợi ý tránh ngày xấu, không khuyến khích mê tín dị đoan.
-- **Tính toán danh xưng**: Tự động xác định cách xưng hô chuẩn xác giữa các thành viên.
-- **Tiện ích nhập liệu**: Hỗ trợ quét thẻ Căn cước công dân (CCCD/ID Card) để điền thông tin tự động nhanh chóng.
-- **Calendar & Văn hóa Việt Nam**: Tích hợp Căn Chi (Giáp Tý, Ất Sửu) để lưu trữ bổ sung. Đồng thời đồng bộ nhắc nhở Sinh nhật, Ngày giỗ (Âm/Dương) vào Google Calendar của người dùng.
-- **Trích xuất dữ liệu**: Hỗ trợ xuất sơ đồ ra file ảnh.
-- **Mạng xã hội Gia Đình (V3)**: Định hướng nâng cấp thành mạng xã hội nội bộ dòng họ, cho phép tích hợp Google Photos API lưu gallery nhiều ảnh cho 1 người, News feed cập nhật sự kiện dòng họ, dễ dàng kết nối và liên lạc.
+- Runtime hiện dùng Vite, React, TypeScript, SQLite WASM trong Worker, OPFS, catalog đa cây và giao diện cây/side panel; các module domain/graph cũ vẫn là baseline prototype.
+- Google Drive chỉ là mock; chưa có đăng nhập hoặc đồng bộ thật.
+- Đã có baseline lint, typecheck, unit test, build và Playwright; phạm vi test vẫn còn tối thiểu.
+- Browser thiếu HTTPS, COOP/COEP, SharedArrayBuffer, Worker hoặc OPFS sẽ thấy lỗi runtime rõ ràng; ứng dụng không fallback sang storage tạm thời.
+- Tree database dùng migrations có version và transaction rollback; schema domain có unions, partners, children, partial dates và provenance. Các validation cho self-link, duplicate membership, dangling reference và ancestor-cycle chạy trước khi ghi quan hệ.
+- Canvas hiện tại chưa dựng cây theo dữ liệu quan hệ thực tế.
 
-## Tham khảo
+Do đó, không dùng runtime hiện tại để lưu dữ liệu gia phả quan trọng hoặc triển khai production cho đến khi các task nền tảng và hardening trong `.plan/task.md` hoàn thành.
 
-Phân tích rút kinh nghiệm từ các dự án mã nguồn mở:
+## TARGET — Hướng sản phẩm
 
-- [Gia-Pha-Dien-Tu](https://github.com/0xAstroAlpha/Gia-Pha-Dien-Tu)
-- [giapha-os](https://github.com/homielab/giapha-os)
-- [AncestorTree](https://github.com/Minh-Tam-Solution/AncestorTree)
+Mục tiêu triển khai của **Gia Phả** trong chính repository này:
 
-## Vibe code with ❤️ by J2TeamNNL
+- Website open source cho người dùng phổ thông và có thể self-host.
+- Dữ liệu được xử lý và lưu trong trình duyệt, không tự động gửi lên server.
+- Hỗ trợ nhiều cây, Native JSON, GEDCOM và các adapter import/export mở rộng.
+- Không tài khoản, telemetry hoặc server lưu gia phả trong core MVP.
+- Không tạo repository greenfield hay đổi tên repository trong phạm vi hiện tại.
+
+## Tài liệu
+
+Bắt đầu tại [`.plan/README.md`](.plan/README.md). Tài liệu này dẫn đến product overview, kiến trúc mục tiêu, data model, quyết định kèm lý do, code review, changelog và task backlog.
+
+Không xem các file phân tích cũ hoặc Git history là mô tả tính năng hiện tại nếu chưa đối chiếu với [legacy review](.plan/reviews/2026-07-11-legacy-review.md).

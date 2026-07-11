@@ -1,82 +1,49 @@
-# Data Schema Diagram
+# Target Domain and Data Model
 
-Vì hệ thống dùng SQLite (sql.js), ta sẽ định nghĩa Schema Database bằng SQL relations tiêu chuẩn phục vụ cho Gia Phả.
+Status: `TARGET`.
 
-## 1. Nguyên Tắc Thiết Kế (Design Principles)
+## Identity and metadata
 
-- **ID là UUIDv4**: Đảm bảo an toàn khi merge dữ liệu từ các nhánh khác nhau trong tương lai (không dùng Integer Auto Increment).
-- **Tên cắt nhỏ (Splitted Names)**: Lưu tách rời `first_name`, `last_name`, `middle_name` để tiện sorting và render song ngữ (Việt đọc Last -> First, Anh đọc First -> Last).
-- **Ngày tháng là Integer Component**: Không lưu chuỗi String Date. Chia `birth_day`, `birth_month`, `birth_year` thành các cột rỗng `INT NULL` vì gia phả cũ thường người ta **CHỈ NHỚ NĂM SINH**, không nhớ ngày tháng.
+- All exported entities use globally unique, stable IDs (UUIDv7 preferred).
+- Every tree records `schema_version`, `created_at`, `updated_at`, optional `reference_person_id`, and source metadata.
+- Imports retain external IDs and adapter-specific extension payloads for future round-trip and linked-source updates.
 
-## 2. Bảng Chính: `persons`
+## Core entities
 
-Bảng này lưu Thông Tin Trực Tiếp của một con người. Không lưu thông tin mối quan hệ ở bảng này (trừ việc xác định Cột Root).
+### `persons`
 
-| Cột                     | Kiểu      | Mô tả                                       |
-| :---------------------- | :-------- | :------------------------------------------ |
-| `id`                    | `UUID`    | PK                                          |
-| `first_name`            | `TEXT`    | Tên (bắt buộc)                              |
-| `last_name`             | `TEXT`    | Họ                                          |
-| `middle_name`           | `TEXT`    | Tên đệm                                     |
-| `title_prefix`          | `TEXT`    | Tiền tố (vd: Cụ, Ông bá, Dr.)               |
-| `gender`                | `TEXT`    | `MALE` / `FEMALE` / `OTHER`                 |
-| `is_living`             | `BOOLEAN` | Đang còn sống?                              |
-| `birth_year`            | `INT`     | Năm sinh                                    |
-| `birth_month`           | `INT`     | Tháng sinh                                  |
-| `birth_day`             | `INT`     | Ngày sinh                                   |
-| `death_year`            | `INT`     | Năm mất                                     |
-| `death_month`           | `INT`     | Tháng mất                                   |
-| `death_day`             | `INT`     | Ngày mất                                    |
-| `death_lunar`           | `TEXT`    | Chuỗi Ngày tháng năm Âm lịch mất            |
-| `burial_location`       | `TEXT`    | (Tùy chọn) Nơi an nghỉ / Vị trí mồ mả       |
-| `phone_number`          | `TEXT`    | Số điện thoại (Chỉ dành cho ai còn sống)    |
-| `contact_address`       | `TEXT`    | Địa chỉ hiện tại                            |
-| `zalo_link` / `fb_link` | `TEXT`    | Mạng xã hội                                 |
-| `avatar_url`            | `TEXT`    | Link ảnh avatar hiện tại                    |
-| `biography`             | `TEXT`    | Lịch sử bản thân, chức vụ, kể lể dòng họ... |
-| `notes`                 | `TEXT`    | Ghi chú nội bộ                              |
+Stores names, gender/sex fields required by genealogy, living status, partial birth/death facts, contact data, biography, notes, and media references. Unknown values are null, not guessed.
 
-## 3. Bảng Mối Quan Hệ: `relationships`
+### `family_unions`
 
-Đóng vai trò cốt lõi nhất để xác định sơ đồ đồ thị đồ sộ (Graph/Tree).
-Để giải quyết đa phu/đa thê, con rể/con dâu, con nuôi, con đẻ, bắt buộc phải dùng Edges Table (Bảng cạnh nối).
+Represents a family/partnership grouping rather than encoding spouse edges twice. It may contain one known parent, multiple partners over time, status, marriage/divorce facts, and notes.
 
-| Cột             | Kiểu      | Mô tả                                                                               |
-| :-------------- | :-------- | :---------------------------------------------------------------------------------- |
-| `id`            | `UUID`    | PK                                                                                  |
-| `person_id`     | `UUID`    | ID của Người Đang Xét (Root Node)                                                   |
-| `related_to_id` | `UUID`    | ID của người có liên kết với họ                                                     |
-| `rel_type`      | `TEXT`    | Kiểu mối quan hệ (Enum)                                                             |
-| `is_primary`    | `BOOLEAN` | Cờ chỉ định quan hệ "Chính". (VD 2 ông chồng thì ai là chồng danh chính ngôn thuận) |
+### `family_partners`
 
-### Danh sách `rel_type` (Enum Enum):
+Joins a person to a union with role/order and optional time range. This supports multiple marriages and incomplete historical records.
 
-1. `PARENT_OF`: person_id là CHA/MẸ đẻ của related_to_id.
-2. `ADOPTED_PARENT_OF`: person_id là CHA/MẸ NUÔI của related_to_id.
-3. `SPOUSE`: person_id là VỢ/CHỒNG của related_to_id.
-4. `EX_SPOUSE`: Vợ/Chồng ly dị.
+### `family_children`
 
-**Tại sao không lưu cột `father_id` và `mother_id` trực tiếp trong bảng `persons`?**
-Vì để giải quyết trường hợp **Đa Thê/Đa Phu**:
+Joins a child to a union with parentage type such as `BIOLOGICAL`, `ADOPTED`, `STEP`, `FOSTER`, or `UNKNOWN`, plus birth order when known. Sibling relationships are derived from shared family membership.
 
-- Nếu Ông A có 3 vợ: Bà X, Bà Y, Bà Z.
-- Ông M là con của Ông A và Bà Y.
-- Cột `father_id` = A, `mother_id` = Y trong bảng Persons là ĐỦ để chạy Tree.
-  _Tuy nhiên_, việc tách ra bảng `relationships` với kiểu `SPOUSE` sẽ giúp UI vẽ được nhánh Hôn Nhân ngang hàng (Ông A - nối ngang - Bà X, Y, Z), từ đó dóng nhánh con Ông M chạy từ kết nối (Ông A + Bà Y) xuống. Graph sẽ rất sạch, không bao giờ bị chéo dây.
+### `events` and `places`
 
-## 4. Bảng Phụ Trợ (Tương Vấn Optionals)
+Provide extensible facts for birth, death, marriage, burial, residence, and later Vietnamese cultural events without adding a new person column for every fact.
 
-### Bảng `media_albums` (Chuẩn bị cho Phase 3)
+### `external_references` and `extension_payloads`
 
-Lưu tập hợp các ID/Link Google Photos ảnh kỷ niệm gán với 1 cá nhân hoặc tập thể.
+Preserve source system IDs, import batch, content hashes, and format-specific records that the canonical model does not yet understand.
 
-| Cột          | Kiểu   | Mô tả                                           |
-| :----------- | :----- | :---------------------------------------------- |
-| `id`         | `UUID` | PK                                              |
-| `person_id`  | `UUID` |                                                 |
-| `media_type` | `TEXT` | IMAGE / DOCUMENT_PDF (Gia phả giấy cũ scan lại) |
-| `url`        | `TEXT` | Link ảnh Drive/Photos                           |
+## Required invariants
 
-### Bảng `events` (Tương lai - Timeline)
+- No person can be their own parent, partner, or child.
+- Parentage must not create an ancestor cycle.
+- Foreign keys are enabled and enforced; deletes use explicit policies.
+- Duplicate partner/child membership in the same union is rejected.
+- Person creation and relationship creation are one transaction.
+- Import is atomic and records warnings/provenance.
+- Sensitive fields are classified so export filters can exclude them consistently.
 
-Phục vụ chức năng "Mạng xã hội Gia Đình". Cập nhật các sự kiện như: Lễ tế họ, Xây lại từ đường, Sinh em bé, Đám cưới.
+## Partial dates
+
+Dates must represent year-only, month/year, complete dates, approximate dates, ranges, and calendar/source text without inventing precision. The storage shape is decided in the schema ADR before implementation and mapped losslessly where the source format permits.

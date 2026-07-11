@@ -1,69 +1,45 @@
-# Gia Phả - Local First Web App
+# Roadmap
 
-## 1. Plan
+`CURRENT`: the existing runtime is a legacy prototype. `TARGET`: the phases below replace it in the existing `gia-pha` repository; they do not describe completed behavior.
 
-- Phân tích các mã nguồn mở về gia phả để rút ra bài học.
-- Chốt tech stack (PWA installable app, React/Next.js/Vue, Google Drive API, Local DB).
-- Thiết kế Data Modeling (hỗ trợ song ngữ Anh-Việt, tách rõ phần First Name / Last Name / Middle Name).
-- Thiết kế Data Modeling nâng cao: Hỗ trợ đa thê/đa phu, lưu location Google Maps cho từng thành viên, phân loại con (đẻ, rể, dâu).
-- Lên lộ trình phát triển thành 3 Phase: **MVP**, **Văn Hóa (V2)**, và **Mạng Xã Hội Gia Đình (V3)**.
-- Triển khai **Version 1 (MVP)** với cấu trúc core: Auth (Google), Google Drive Sync, Local SQLite, Vẽ sơ đồ.
+## Phase 0 - Documentation and validation
 
-## 2. Tasks
+- [x] Review the legacy codebase and existing planning documents.
+- [x] Lock product intent, privacy model, target audience, and open-source license.
+- [x] Define target architecture, domain model, file formats, AI documentation rules, and backlog.
+- [x] Align documentation with ADR-010: implement the target in the existing `gia-pha` repository, with no greenfield repository or rename.
+- [x] Perform and record the read-only audit of VPS alias `j2`; deployment remains blocked by the documented header/administration constraints.
 
-- [x] Clone các repo tham khảo vào thư mục `references`.
-- [x] Phân tích ưu/nhược điểm của các repo tham khảo.
-- [x] Chốt công nghệ và Data Schema (có hỗ trợ PWA và Google Drive sync).
-- [x] Khởi tạo bộ khung dự án MVP (Next.js + sql.js).
-- [x] Onboarding Screen: Tách riêng Họ/Tên đệm/Tên + Autofill + Phone (+84).
-- [x] Đa ngôn ngữ (i18n): VI/EN labels, chọn ngôn ngữ trên Header.
-- [x] Sửa lỗi NOT NULL constraint và SQLite Caching bug.
-- [x] Sửa lỗi "Empty Tree" sau Onboarding (sql.js minification bug).
-- [x] Redesign PersonCard: Glassmorphism, soft shadow, ring borders.
-- [x] Redesign FamilyTreeCanvas: Infinite panning, CSS tree connectors.
-- [x] Nút (+) Thêm Nhánh Trực Tiếp: Thêm Cha/Mẹ, Con, Vợ/Chồng, Anh Chị Em.
-- [x] Auto-create Relationship khi thêm từ nút (+).
-- [x] Responsive Mobile UI: Header & SidePanel.
-- [/] Cập nhật `.plan/plan.md` và duy trì single source of truth.
-- [ ] Gợi ý Họ tự động cho người mới (từ gia phả hiện có).
-- [ ] Tính toán danh xưng tự động.
-- [ ] Google Drive Sync (lưu/tải file SQLite lên Drive API).
-- [ ] **Tử Vi / Bói Toán**: Đề xuất tên cho con, ngày cưới/sinh. Cảnh báo ngày kỵ, tránh mê tín.
-- [ ] Quét CCCD/Hộ khẩu (Tesseract OCR) để tự động điền thông tin.
-- [ ] Import/Export CSV, GEDCOM.
-- [ ] Tích hợp Google Calendar nhắc Sinh nhật, Ngày giỗ.
-- [ ] Xuất sơ đồ cây ra file ảnh (PNG/PDF).
+## Phase 1 - In-place foundation
 
-## 3. Flow
+- [x] Establish the FND-001 quality baseline in `gia-pha`: lint, typecheck, Vitest, production build, Playwright, and GitHub Actions.
+- [x] Replace the Next/Turbopack build baseline with Vite, React, TypeScript, Tailwind, test tooling, and CI in `gia-pha`.
+- Add local-only network policy, build metadata, error boundary, and opt-in diagnostic report.
+- [x] Establish a SQLite WASM Worker with OPFS persistence checks and explicit capability failures.
+- [x] Implement an OPFS SQLite catalog plus isolated tree files, with create, rename, open, and confirmed delete flows.
 
-- Người dùng truy cập website và có thể bấm cài đặt thành PWA (app trên iOS/Android).
-- Người dùng đăng nhập bằng tài khoản Google.
-- Ứng dụng kết nối với Google Drive API (yêu cầu quyền truy cập thư mục của app).
-- Đồng bộ file dữ liệu (JSON/SQLite) từ Drive về máy trạm (lưu trong IndexedDB của trình duyệt).
-- Người dùng xem, thêm, sửa, xóa thông tin trên giao diện.
-- Mọi dữ liệu sửa đổi được lưu offline lập tức (IndexedDB).
-- Trigger một tiến trình ngầm (background sync) để upload/update file dữ liệu ngược lại lên Google Drive.
+## Phase 2 - Core genealogy
 
-## 4. Changelog
+- [x] Add versioned, transactional migrations for the domain schema, including unions, partners, children, dates, and provenance.
+- [x] Validate self-links, duplicate memberships, dangling references, and parent ancestry cycles before relationship commits.
+- Implement tree, person, family union, partner, child, and event repositories.
+- Add transactions, constraints, migrations, cycle detection, and multi-tree isolation.
+- Build workspace, onboarding, CRUD forms, search, reference-person selection, and responsive side panel.
+- Render focused graph views using React Flow and ELK worker.
 
-### [0.3.0] - 2026-03-06
+## Phase 3 - Interoperability
 
-- **Added**: Nút (+) Thêm Nhánh Trực Tiếp (Top, Bottom, Left, Right).
-- **Added**: Auto-create Relationship & Dynamic Form Header.
-- **Changed**: Redesign PersonCard (Glassmorphism) & FamilyTreeCanvas (Infinite panning, CSS connectors).
+- Publish Native JSON v1 schema and lossless round-trip tests.
+- Import GEDCOM 5.5/5.5.1/7; export GEDCOM 7 and compatibility-mode 5.5.1.
+- Preserve unknown extensions and generate explicit compatibility/loss reports.
+- Add branch selection, privacy filters, and plaintext export warnings.
 
-### [0.2.0] - 2026-03-05
+## Phase 4 - Hardening and release
 
-- **Fixed**: Lỗi NOT NULL constraint & Empty Tree (sql.js browser binding/minification).
-- **Added**: Responsive Mobile UI, i18n (VI/EN), Gợi ý Họ (Autocomplete).
-- **Changed**: Onboarding Form tách riêng Họ/Tên đệm/Tên.
+- Meet accessibility, browser, privacy, and 10k-person performance gates.
+- Audit production artifact for external network dependencies.
+- Decide deployment design from the VPS audit; deployment itself requires a separate approved task.
 
-### [0.1.0] - 2026-03-04
+## Later roadmap
 
-- Khởi tạo dự án Next.js PWA + sql.js.
-- Database Schema: `persons` (25 fields), `relationships`.
-- Onboarding Screen MVP.
-
-### **2026-02-28**
-
-- Khởi tạo file `.plan`. Tải bộ source tham khảo.
+- PWA/offline installation, optional Drive sync, manual linked-source updates, reviewed merge/rollback, additional platform adapters, Vietnamese cultural modules, OCR, and media.

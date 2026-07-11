@@ -40,6 +40,7 @@ interface TreeState {
   closeForm: () => void;
   setAnchorPersonId: (id: string | null) => void;
   setLocale: (locale: Locale) => void;
+  resetTree: () => void;
   trackFieldUsage: (fieldName: string) => void;
 }
 
@@ -86,6 +87,16 @@ export const useTreeStore = create<TreeState>()(
       setAnchorPersonId: (id) =>
         set({ anchorPersonId: id, isOnboarding: false }),
       setLocale: (locale) => set({ locale }),
+      resetTree: () =>
+        set({
+          persons: [],
+          relationships: [],
+          selectedPersonId: null,
+          anchorPersonId: null,
+          isFormOpen: false,
+          formPreFill: null,
+          isOnboarding: true,
+        }),
 
       trackFieldUsage: (fieldName) =>
         set((s) => ({

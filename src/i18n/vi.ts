@@ -64,8 +64,8 @@ export interface Dictionary {
  * Vietnamese translation dictionary
  */
 export const vi: Dictionary = {
-  appName: "Cội Nguồn",
-  appTagline: "Gia Phả",
+  appName: "Gia Phả",
+  appTagline: "Gia phả local-first",
 
   // Header
   header: {
