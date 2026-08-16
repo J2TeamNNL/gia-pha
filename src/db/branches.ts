@@ -14,12 +14,13 @@ export async function createBranchProfile(
   const db = await getDb();
   const profile: BranchProfile = { id: uuidv4(), ...input };
   await db.run(
-    `INSERT INTO branch_profiles (id, name, region_code, language_code, parent_profile_id, notes)
-     VALUES (?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO branch_profiles (id, name, region_code, province_code, language_code, parent_profile_id, notes)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`,
     [
       profile.id,
       profile.name,
       profile.region_code,
+      profile.province_code ?? null,
       profile.language_code,
       profile.parent_profile_id ?? null,
       profile.notes ?? null,
@@ -51,15 +52,16 @@ export async function deleteBranchProfile(id: string): Promise<void> {
 export async function listBranchProfiles(): Promise<BranchProfile[]> {
   const db = await getDb();
   const result = await db.exec(
-    "SELECT id, name, region_code, language_code, parent_profile_id, notes FROM branch_profiles ORDER BY name",
+    "SELECT id, name, region_code, province_code, language_code, parent_profile_id, notes FROM branch_profiles ORDER BY name",
   );
   return values(result).map((row) => ({
     id: String(row[0]),
     name: String(row[1]),
     region_code: row[2] as BranchProfile["region_code"],
-    language_code: String(row[3]),
-    parent_profile_id: row[4] == null ? undefined : String(row[4]),
-    notes: row[5] == null ? undefined : String(row[5]),
+    province_code: row[3] == null ? undefined : String(row[3]),
+    language_code: String(row[4]),
+    parent_profile_id: row[5] == null ? undefined : String(row[5]),
+    notes: row[6] == null ? undefined : String(row[6]),
   }));
 }
 

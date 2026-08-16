@@ -1,4 +1,4 @@
-export const LATEST_SCHEMA_VERSION = 4;
+export const LATEST_SCHEMA_VERSION = 5;
 
 /** First schema version that has the tree_metadata table to keep in sync. */
 const TREE_METADATA_SINCE_VERSION = 2;
@@ -227,11 +227,16 @@ const BRANCH_PROFILES_SCHEMA_SQL = `
   CREATE INDEX IF NOT EXISTS idx_person_branch_links_profile ON person_branch_links(branch_profile_id);
 `;
 
+const BRANCH_PROVINCE_SQL = `
+  ALTER TABLE branch_profiles ADD COLUMN province_code TEXT;
+`;
+
 export const SCHEMA_MIGRATIONS: readonly SchemaMigration[] = [
   { version: 1, description: "Preserve prototype people and relationships", sql: INITIAL_SCHEMA_SQL },
   { version: 2, description: "Add versioned genealogy domain tables", sql: DOMAIN_SCHEMA_SQL },
   { version: 3, description: "Index relationships by person for deletes and traversal", sql: RELATIONSHIP_INDEXES_SQL },
   { version: 4, description: "Add xưng hô branch profiles and membership links", sql: BRANCH_PROFILES_SCHEMA_SQL },
+  { version: 5, description: "Let a branch select a provincial dialect variant", sql: BRANCH_PROVINCE_SQL },
 ];
 
 export function migrationsAfter(version: number): readonly SchemaMigration[] {

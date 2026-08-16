@@ -1,5 +1,6 @@
 export { MAX_PATH_DEPTH, resolvePath } from "./path";
 export { compareSeniority } from "./seniority";
+export { resolveBranchAddresses, profileFor } from "./branchContext";
 export {
   BAC,
   TRUNG,
@@ -10,6 +11,11 @@ export {
   birthOrderLabel,
   withProvince,
 } from "./dictionaries";
+export type {
+  AddressContext,
+  BranchAddress,
+  BranchDialect,
+} from "./branchContext";
 export type {
   AddressEntry,
   AddressPair,

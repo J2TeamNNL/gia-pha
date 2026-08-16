@@ -50,12 +50,9 @@ describe("database schema", () => {
   });
 
   it("plans each pending schema version in order", () => {
-    expect(migrationsAfter(0).map((migration) => migration.version)).toEqual([
-      1,
-      2,
-      3,
-      4,
-    ]);
+    expect(migrationsAfter(0).map((migration) => migration.version)).toEqual(
+      Array.from({ length: LATEST_SCHEMA_VERSION }, (_, index) => index + 1),
+    );
     expect(migrationsAfter(LATEST_SCHEMA_VERSION)).toEqual([]);
     expect(() => migrationsAfter(99)).toThrow("Unsupported schema version");
   });
@@ -73,7 +70,7 @@ describe("database schema", () => {
       now: () => "2026-08-16T00:00:00.000Z",
     });
 
-    expect(version).toBe(4);
+    expect(version).toBe(LATEST_SCHEMA_VERSION);
     expect(statements.join("\n")).toContain("CREATE TABLE IF NOT EXISTS branch_profiles");
     expect(statements.join("\n")).toContain("CREATE TABLE IF NOT EXISTS branch_roots");
     expect(statements.join("\n")).toContain("CREATE TABLE IF NOT EXISTS person_branch_links");
@@ -120,8 +117,12 @@ describe("database schema", () => {
     });
 
     expect(version).toBe(LATEST_SCHEMA_VERSION);
-    expect(statements.filter((statement) => statement === "BEGIN IMMEDIATE")).toHaveLength(4);
-    expect(statements.filter((statement) => statement === "COMMIT")).toHaveLength(4);
+    expect(statements.filter((statement) => statement === "BEGIN IMMEDIATE")).toHaveLength(
+      LATEST_SCHEMA_VERSION,
+    );
+    expect(statements.filter((statement) => statement === "COMMIT")).toHaveLength(
+      LATEST_SCHEMA_VERSION,
+    );
   });
 
   it("enables foreign key enforcement even when no migrations are pending", () => {

@@ -50,6 +50,8 @@ export interface BranchProfile {
   id: string;
   name: string;
   region_code: RegionCode;
+  /** Selects a provincial dialect variant, e.g. `QUANG_TRI` within `TRUNG`. */
+  province_code?: string;
   language_code: string;
   parent_profile_id?: string;
   notes?: string;

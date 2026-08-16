@@ -4,6 +4,44 @@
 
 This log records both implementation and durable documentation changes. Dates use `YYYY-MM-DD`.
 
+## 2026-08-16 - The kinship engine now knows which dialect to speak
+
+**What**
+
+- `XH-007`: `src/kinship/branchContext.ts` — `resolveBranchAddresses(ego, target, context)`
+  returns one resolution per branch the target belongs to, each rendered in that branch's
+  regional profile, and falls back to a user-chosen default region for anyone in no branch.
+- Deep "gọi thay ngôi": when the target sits in a branch ego does not belong to, the term is
+  resolved from a spouse who does belong to it, and the result records `viaPersonId`.
+- Schema migration v5 adds `branch_profiles.province_code`, so a branch can select a
+  provincial variant such as `TRUNG:QUANG_TRI` rather than only a region.
+- `src/db/addressContext.ts` loads every profile and membership row in two queries, and
+  `src/components/useAddressContext.ts` assembles the context from what the store already
+  holds, so resolving a term costs no database roundtrip.
+- The store gains `branchProfiles`, `branchLinks`, and a persisted `defaultRegion`.
+
+**Why**
+
+- The resolver and the branch repository both landed in the previous session and nothing
+  connected them; every downstream feature needs this join first.
+- A tree assembled from one family reaches across regions — a Quảng Trị paternal line, a
+  Hà Nội maternal line, a southern spouse's family — and each is addressed in its own
+  register at the same time. One resolution per branch is the only honest answer.
+- `defaultRegion` is a stated user choice rather than a hidden constant, because a wrong
+  default would silently render wrong terms for everyone not yet assigned to a branch.
+
+**Impact**
+
+- `LATEST_SCHEMA_VERSION` is now 5; the migration is additive and forward-only.
+- `schema.test.ts` no longer hardcodes the migration count, so future migrations do not
+  require editing three assertions.
+- 101 tests across 16 files; lint, typecheck, and build pass.
+
+**References**
+
+- `src/kinship/{branchContext.ts,branchContext.test.ts}`, `src/db/addressContext.ts`
+- `src/components/useAddressContext.ts`, `src/db/schema.ts` (v5), `tasks.md` `XH-007`
+
 ## 2026-08-16 - Faster in-app entry, and siblings that actually link
 
 **What**

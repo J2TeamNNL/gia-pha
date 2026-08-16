@@ -3,7 +3,13 @@
  */
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { type Person, type Relationship } from "@/db/types";
+import {
+  type BranchProfile,
+  type Person,
+  type PersonBranchLink,
+  type RegionCode,
+  type Relationship,
+} from "@/db/types";
 import type { Locale } from "@/i18n";
 
 interface TreeState {
@@ -20,6 +26,11 @@ interface TreeState {
   } | null;
   isOnboarding: boolean;
   locale: Locale;
+
+  branchProfiles: BranchProfile[];
+  branchLinks: PersonBranchLink[];
+  /** Dialect used for anyone who belongs to no branch; user-chosen, not guessed. */
+  defaultRegion: RegionCode;
 
   frequentlyUsedFields: string[];
 
@@ -41,6 +52,11 @@ interface TreeState {
   closeForm: () => void;
   setAnchorPersonId: (id: string | null) => void;
   setLocale: (locale: Locale) => void;
+  setBranchMembership: (
+    profiles: BranchProfile[],
+    links: PersonBranchLink[],
+  ) => void;
+  setDefaultRegion: (region: RegionCode) => void;
   resetTree: () => void;
   trackFieldUsage: (fieldName: string) => void;
 }
@@ -58,6 +74,9 @@ export const useTreeStore = create<TreeState>()(
       formMode: "quick",
       locale: "vi",
       frequentlyUsedFields: [],
+      branchProfiles: [],
+      branchLinks: [],
+      defaultRegion: "BAC",
 
       setPersons: (persons) => set({ persons }),
       addPerson: (person) => set((s) => ({ persons: [...s.persons, person] })),
@@ -94,6 +113,9 @@ export const useTreeStore = create<TreeState>()(
       setAnchorPersonId: (id) =>
         set({ anchorPersonId: id, isOnboarding: false }),
       setLocale: (locale) => set({ locale }),
+      setBranchMembership: (branchProfiles, branchLinks) =>
+        set({ branchProfiles, branchLinks }),
+      setDefaultRegion: (defaultRegion) => set({ defaultRegion }),
       resetTree: () =>
         set({
           persons: [],
@@ -103,6 +125,8 @@ export const useTreeStore = create<TreeState>()(
           isFormOpen: false,
           formPreFill: null,
           isOnboarding: true,
+          branchProfiles: [],
+          branchLinks: [],
         }),
 
       trackFieldUsage: (fieldName) =>
@@ -119,6 +143,7 @@ export const useTreeStore = create<TreeState>()(
         anchorPersonId: s.anchorPersonId,
         isOnboarding: s.isOnboarding,
         locale: s.locale,
+        defaultRegion: s.defaultRegion,
       }),
     },
   ),

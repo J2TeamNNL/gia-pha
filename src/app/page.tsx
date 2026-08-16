@@ -27,6 +27,7 @@ import {
   renameTree,
 } from "@/db/client";
 import { getAllPersons, getAllRelationships } from "@/db/persons";
+import { loadBranchMembership } from "@/db/addressContext";
 import type { TreeMetadata } from "@/db/catalog";
 
 export default function Home() {
@@ -39,6 +40,7 @@ export default function Home() {
     setPersons,
     setRelationships,
     setAnchorPersonId,
+    setBranchMembership,
     resetTree,
   } = useTreeStore();
   const t = useTranslation();
@@ -95,11 +97,16 @@ export default function Home() {
     let cancelled = false;
     resetTree();
 
-    void Promise.all([getAllPersons(), getAllRelationships()])
-      .then(([storedPersons, storedRelationships]) => {
+    void Promise.all([
+      getAllPersons(),
+      getAllRelationships(),
+      loadBranchMembership(),
+    ])
+      .then(([storedPersons, storedRelationships, membership]) => {
         if (cancelled) return;
         setPersons(storedPersons);
         setRelationships(storedRelationships);
+        setBranchMembership(membership.profiles, membership.links);
         const anchor = storedPersons.find((person) => person.is_anchor);
         if (anchor) setAnchorPersonId(anchor.id);
       })
@@ -114,7 +121,14 @@ export default function Home() {
     return () => {
       cancelled = true;
     };
-  }, [activeTreeId, resetTree, setAnchorPersonId, setPersons, setRelationships]);
+  }, [
+    activeTreeId,
+    resetTree,
+    setAnchorPersonId,
+    setBranchMembership,
+    setPersons,
+    setRelationships,
+  ]);
 
   const runCatalogAction = async (action: () => Promise<void>) => {
     setCatalogBusy(true);
