@@ -95,6 +95,39 @@ export interface Dictionary {
     closePanel: string;
   };
   personCard: { deceased: string };
+  relatives: {
+    open: string;
+    title: string;
+    description: string;
+    close: string;
+    noAnchor: string;
+    empty: string;
+    count: string;
+    columns: {
+      name: string;
+      call: string;
+      selfRef: string;
+      branch: string;
+      generation: string;
+      birthYear: string;
+      note: string;
+    };
+    sortBy: string;
+    sortKinship: string;
+    sortName: string;
+    sortBranch: string;
+    register: string;
+    registers: { spoken: string; formal: string; reference: string };
+    exportAs: string;
+    invitation: string;
+    invitationHint: string;
+    invitationPlaceholder: string;
+    invitationCopy: string;
+    invitationCopied: string;
+    invitationEmpty: string;
+    unresolved: string;
+    viaSpouse: string;
+  };
   kinship: {
     unknown: string;
     callLabel: string;
@@ -287,6 +320,42 @@ export const vi: Dictionary = {
 
   personCard: {
     deceased: "Đã mất",
+  },
+
+  relatives: {
+    open: "Danh sách họ hàng",
+    title: "Danh sách họ hàng",
+    description:
+      "Mọi người thân tính từ người đang làm trung tâm, kèm cách bạn gọi họ và cách bạn xưng.",
+    close: "Đóng",
+    noAnchor: "Hãy chọn một người làm trung tâm trước.",
+    empty: "Chưa có người thân nào để liệt kê.",
+    count: "{count} dòng",
+    columns: {
+      name: "Họ tên",
+      call: "Gọi",
+      selfRef: "Xưng",
+      branch: "Nhánh",
+      generation: "Vai vế",
+      birthYear: "Năm sinh",
+      note: "Ghi chú",
+    },
+    sortBy: "Sắp xếp",
+    sortKinship: "Theo nhánh & vai vế",
+    sortName: "Theo tên",
+    sortBranch: "Theo nhánh",
+    register: "Giọng",
+    registers: { spoken: "Nói thường", formal: "Trang trọng", reference: "Nhắc đến" },
+    exportAs: "Xuất",
+    invitation: "Mẫu câu thiệp mời",
+    invitationHint:
+      "Bạn tự viết mẫu, app điền tên vào. Dùng {call} cho cách gọi và {name} cho họ tên. Ví dụ: Kính mời {call} {name}.",
+    invitationPlaceholder: "Kính mời {call} {name}",
+    invitationCopy: "Chép toàn bộ",
+    invitationCopied: "Đã chép.",
+    invitationEmpty: "Viết mẫu câu ở trên để xem kết quả.",
+    unresolved: "chưa rõ",
+    viaSpouse: "gọi thay ngôi",
   },
 
   kinship: {

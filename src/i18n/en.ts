@@ -109,6 +109,42 @@ export const en: Dictionary = {
     deceased: "Deceased",
   },
 
+  relatives: {
+    open: "Relatives",
+    title: "Relative list",
+    description:
+      "Everyone related to the reference person, with the term you use for them and the one you use back.",
+    close: "Close",
+    noAnchor: "Pick a reference person first.",
+    empty: "No relatives to list yet.",
+    count: "{count} rows",
+    columns: {
+      name: "Full name",
+      call: "Call them",
+      selfRef: "Call yourself",
+      branch: "Branch",
+      generation: "Rank",
+      birthYear: "Birth year",
+      note: "Notes",
+    },
+    sortBy: "Sort",
+    sortKinship: "Branch and rank",
+    sortName: "Name",
+    sortBranch: "Branch",
+    register: "Register",
+    registers: { spoken: "Spoken", formal: "Formal", reference: "Reference" },
+    exportAs: "Export",
+    invitation: "Invitation wording",
+    invitationHint:
+      "Write your own wording; the app fills in the names. Use {call} for the term and {name} for the full name.",
+    invitationPlaceholder: "Kính mời {call} {name}",
+    invitationCopy: "Copy all",
+    invitationCopied: "Copied.",
+    invitationEmpty: "Write your wording above to see the result.",
+    unresolved: "not known",
+    viaSpouse: "via spouse",
+  },
+
   kinship: {
     unknown: "not known",
     callLabel: "Call",

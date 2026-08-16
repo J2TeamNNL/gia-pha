@@ -4,6 +4,41 @@
 
 This log records both implementation and durable documentation changes. Dates use `YYYY-MM-DD`.
 
+## 2026-08-16 - The relative list, and an invitation wording the founder writes
+
+**What**
+
+- `XH-006`: `src/kinship/relativeList.ts` — `buildRelativeRows` produces one row per person
+  per branch with the term, the self-reference, the branch, and the rank; `generationOf`
+  reads rank off the path signature; `sortRelativeRows` orders by branch then elders first,
+  then oldest first within a rank.
+- `src/components/RelativeList.tsx` — the table, a register switch (spoken / formal /
+  reference), sorting, and export.
+- `src/lib/exportFile.ts` — CSV (with a BOM so Excel reads Vietnamese), TSV, JSON, and plain
+  text, built in memory and handed to the browser through an object URL.
+- The invitation wording is a template the user writes — `{call}` and `{name}` are filled in
+  per relative — with a copy-all button.
+
+**Why**
+
+- The default order matches how invitations are actually written: one branch at a time,
+  elders before juniors. Confirmed with the founder rather than assumed.
+- The wording is not shipped as a fixed sentence. Every family phrases an invitation its own
+  way, so guessing would produce something that reads wrong on a printed card; the founder
+  writes the sentence once and the list fills in the names.
+- Four export formats because the list has to reach a printer, a spreadsheet, and a phone.
+
+**Impact**
+
+- Relatives whose term is unresolved appear in the table marked `chưa rõ`, and are left out
+  of the invitation output rather than being printed with a guessed term.
+- 119 tests across 19 files; lint, typecheck, and build pass.
+
+**References**
+
+- `src/kinship/{relativeList.ts,relativeList.test.ts}`, `src/components/RelativeList.tsx`
+- `src/lib/{exportFile.ts,exportFile.test.ts}`, `tasks.md` `XH-006`
+
 ## 2026-08-16 - Address terms visible while you enter the tree
 
 **What**

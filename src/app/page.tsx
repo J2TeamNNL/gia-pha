@@ -8,6 +8,7 @@ import { OnboardingScreen } from "@/components/OnboardingScreen";
 import { TreeCatalog } from "@/components/TreeCatalog";
 import { PasteImport } from "@/components/PasteImport";
 import { BranchSetup } from "@/components/BranchSetup";
+import { RelativeList } from "@/components/RelativeList";
 import { useTreeStore } from "@/store/treeStore";
 import { useTranslation } from "@/i18n/useTranslation";
 import {
@@ -17,6 +18,7 @@ import {
   Globe,
   Plus,
   TreePine,
+  Users,
 } from "lucide-react";
 import type { Locale } from "@/i18n";
 import {
@@ -55,9 +57,14 @@ export default function Home() {
   const [catalogVisible, setCatalogVisible] = useState(false);
   const [pasteVisible, setPasteVisible] = useState(false);
   const [branchVisible, setBranchVisible] = useState(false);
+  const [relativesVisible, setRelativesVisible] = useState(false);
   const showOnboarding = isOnboarding && persons.length === 0;
   const showsWorkspaceActions =
-    Boolean(activeTreeId) && !catalogVisible && !pasteVisible && !branchVisible;
+    Boolean(activeTreeId) &&
+    !catalogVisible &&
+    !pasteVisible &&
+    !branchVisible &&
+    !relativesVisible;
 
   useEffect(() => {
     const error = getDatabaseRuntimeError()?.message;
@@ -171,6 +178,7 @@ export default function Home() {
               type="button"
               onClick={() => {
                 setBranchVisible(false);
+                setRelativesVisible(false);
                 setPasteVisible((visible) => !visible);
               }}
               className="flex items-center gap-1.5 border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-sm px-3 py-2 rounded-full transition-colors"
@@ -186,6 +194,7 @@ export default function Home() {
               type="button"
               onClick={() => {
                 setPasteVisible(false);
+                setRelativesVisible(false);
                 setBranchVisible((visible) => !visible);
               }}
               className="flex items-center gap-1.5 border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-sm px-3 py-2 rounded-full transition-colors"
@@ -196,11 +205,28 @@ export default function Home() {
               <span className="hidden sm:inline">{t.branch.open}</span>
             </button>
           )}
+          {activeTreeId && !catalogVisible && (
+            <button
+              type="button"
+              onClick={() => {
+                setPasteVisible(false);
+                setBranchVisible(false);
+                setRelativesVisible((visible) => !visible);
+              }}
+              className="flex items-center gap-1.5 border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-sm px-3 py-2 rounded-full transition-colors"
+              aria-pressed={relativesVisible}
+              aria-label={t.relatives.open}
+            >
+              <Users className="size-4" />
+              <span className="hidden sm:inline">{t.relatives.open}</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={() => {
               setPasteVisible(false);
               setBranchVisible(false);
+              setRelativesVisible(false);
               setCatalogVisible((visible) => !visible);
             }}
             className="flex items-center gap-1.5 border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-sm px-3 py-2 rounded-full transition-colors"
@@ -292,6 +318,8 @@ export default function Home() {
           <PasteImport onClose={() => setPasteVisible(false)} />
         ) : branchVisible ? (
           <BranchSetup onClose={() => setBranchVisible(false)} />
+        ) : relativesVisible ? (
+          <RelativeList onClose={() => setRelativesVisible(false)} />
         ) : showOnboarding ? (
           <OnboardingScreen />
         ) : (
