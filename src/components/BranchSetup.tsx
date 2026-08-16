@@ -151,7 +151,11 @@ export function BranchSetup({ onClose }: BranchSetupProps) {
 
         <div className="rounded-xl border border-stone-200 bg-white p-4">
           <Label>{t.branch.defaultRegion}</Label>
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div
+            role="group"
+            aria-label={t.branch.defaultRegion}
+            className="mt-2 flex flex-wrap gap-2"
+          >
             {REGIONS.map((region) => (
               <button
                 key={region}
@@ -282,7 +286,11 @@ export function BranchSetup({ onClose }: BranchSetupProps) {
 
               <div className="space-y-1.5">
                 <Label>{t.branch.region}</Label>
-                <div className="flex flex-wrap gap-2">
+                <div
+                  role="group"
+                  aria-label={t.branch.region}
+                  className="flex flex-wrap gap-2"
+                >
                   {REGIONS.map((region) => (
                     <button
                       key={region}

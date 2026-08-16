@@ -4,6 +4,41 @@
 
 This log records both implementation and durable documentation changes. Dates use `YYYY-MM-DD`.
 
+## 2026-08-16 - Browser proof for the whole xưng hô flow, and a CSV export that cannot run
+
+**What**
+
+- `e2e/xung-ho.spec.ts` drives the founder's actual path in a real browser: paste a family,
+  make one person the reference, read `bác` off the uncle's card, open the relative list,
+  fill in an invitation wording, download the CSV, then create a Quảng Trị branch and see it
+  in the graph legend.
+- CSV and TSV cells opening with `=`, `+`, `-`, or `@` are prefixed with an apostrophe so a
+  spreadsheet treats them as text.
+- Both region pickers in branch setup carry a `role="group"` and an `aria-label`.
+
+**Why**
+
+- Changing `QuickAddForm` to read its placeholders from the dictionaries broke two existing
+  Playwright selectors, and that was not caught until e2e ran — the unit tests and the build
+  were both green over a red CI. The new spec exists so the screens built this session cannot
+  break the same silent way.
+- Names are user-entered and an exported list gets shared with relatives; a name beginning
+  with a formula character would execute when the file is opened. Flagged by an automated
+  review of the previous commit.
+- The two region pickers rendered identical button names with nothing to tell them apart,
+  which is a real problem for anyone navigating by screen reader, not only for the test.
+
+**Impact**
+
+- `npm run test:e2e` covers 6 specs; lint, typecheck, 125 unit tests, and the build pass.
+- A name legitimately starting with `-` now exports with a leading apostrophe visible in the
+  cell. That is the accepted cost of the file not executing.
+
+**References**
+
+- `e2e/xung-ho.spec.ts`, `e2e/home.spec.ts`, `src/lib/exportFile.ts`
+- `src/components/BranchSetup.tsx`
+
 ## 2026-08-16 - Branches are distinguishable at a glance
 
 **What**

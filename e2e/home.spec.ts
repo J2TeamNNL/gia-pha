@@ -53,7 +53,7 @@ test("searches members by unaccented text and selects the reference person via k
   await expect(page.getByText("Nguyễn Đức", { exact: true })).toBeVisible();
 
   await page.getByRole("button", { name: "Thêm thành viên" }).click();
-  await page.getByPlaceholder("vd: An / John").fill("Trần Bình");
+  await page.getByPlaceholder("vd: An").fill("Trần Bình");
   await page.getByRole("button", { name: "Lưu thành viên" }).click();
   await expect(page.getByText("Trần Bình", { exact: true })).toBeVisible();
 
@@ -87,7 +87,7 @@ test("renders the family graph with relatives added from a card", async ({ page 
   // Select the card, add a parent through the directional button.
   await page.getByRole("button", { name: "Nguyễn Tâm" }).click();
   await page.getByTitle("Thêm cha mẹ").click();
-  await page.getByPlaceholder("vd: An / John").fill("Nguyễn Cha");
+  await page.getByPlaceholder("vd: An").fill("Nguyễn Cha");
   await page.getByRole("button", { name: "Lưu thành viên" }).click();
   await expect(page.getByText("Nguyễn Cha", { exact: true })).toBeVisible();
 

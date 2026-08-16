@@ -12,8 +12,18 @@ export const EXPORT_MIME: Record<ExportFormat, string> = {
   txt: "text/plain;charset=utf-8",
 };
 
+/**
+ * A cell opening with a formula character is executed by Excel and Sheets when
+ * the file is opened. Names are user-entered and exports get shared, so the
+ * leading apostrophe forces the cell to stay text.
+ */
+function neutralizeFormula(value: string): string {
+  return /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
+}
+
 function escapeCsvCell(value: string): string {
-  return /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
+  const safe = neutralizeFormula(value);
+  return /[",\n]/.test(safe) ? `"${safe.replace(/"/g, '""')}"` : safe;
 }
 
 export function toDelimited(
@@ -25,7 +35,9 @@ export function toDelimited(
     .map((cells) =>
       cells
         .map((cell) =>
-          format === "csv" ? escapeCsvCell(cell) : cell.replace(/[\t\n]/g, " "),
+          format === "csv"
+            ? escapeCsvCell(cell)
+            : neutralizeFormula(cell.replace(/[\t\n]/g, " ")),
         )
         .join(delimiter),
     )
