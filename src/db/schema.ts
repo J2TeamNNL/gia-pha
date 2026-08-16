@@ -1,4 +1,4 @@
-export const LATEST_SCHEMA_VERSION = 3;
+export const LATEST_SCHEMA_VERSION = 4;
 
 /** First schema version that has the tree_metadata table to keep in sync. */
 const TREE_METADATA_SINCE_VERSION = 2;
@@ -194,10 +194,44 @@ const RELATIONSHIP_INDEXES_SQL = `
   CREATE INDEX IF NOT EXISTS idx_relationships_related_to ON relationships(related_to_id);
 `;
 
+const BRANCH_PROFILES_SCHEMA_SQL = `
+  CREATE TABLE IF NOT EXISTS branch_profiles (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    region_code TEXT NOT NULL CHECK (region_code IN ('BAC', 'TRUNG', 'NAM')),
+    language_code TEXT NOT NULL DEFAULT 'vi',
+    parent_profile_id TEXT REFERENCES branch_profiles(id) ON DELETE SET NULL,
+    notes TEXT,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS branch_roots (
+    id TEXT PRIMARY KEY,
+    branch_profile_id TEXT NOT NULL REFERENCES branch_profiles(id) ON DELETE CASCADE,
+    root_person_id TEXT NOT NULL REFERENCES persons(id) ON DELETE CASCADE,
+    UNIQUE (branch_profile_id, root_person_id)
+  );
+
+  CREATE TABLE IF NOT EXISTS person_branch_links (
+    id TEXT PRIMARY KEY,
+    person_id TEXT NOT NULL REFERENCES persons(id) ON DELETE CASCADE,
+    branch_profile_id TEXT NOT NULL REFERENCES branch_profiles(id) ON DELETE CASCADE,
+    source TEXT NOT NULL CHECK (source IN ('DERIVED', 'MANUAL')),
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE (person_id, branch_profile_id, source)
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_branch_roots_profile ON branch_roots(branch_profile_id);
+  CREATE INDEX IF NOT EXISTS idx_person_branch_links_person ON person_branch_links(person_id);
+  CREATE INDEX IF NOT EXISTS idx_person_branch_links_profile ON person_branch_links(branch_profile_id);
+`;
+
 export const SCHEMA_MIGRATIONS: readonly SchemaMigration[] = [
   { version: 1, description: "Preserve prototype people and relationships", sql: INITIAL_SCHEMA_SQL },
   { version: 2, description: "Add versioned genealogy domain tables", sql: DOMAIN_SCHEMA_SQL },
   { version: 3, description: "Index relationships by person for deletes and traversal", sql: RELATIONSHIP_INDEXES_SQL },
+  { version: 4, description: "Add xưng hô branch profiles and membership links", sql: BRANCH_PROFILES_SCHEMA_SQL },
 ];
 
 export function migrationsAfter(version: number): readonly SchemaMigration[] {

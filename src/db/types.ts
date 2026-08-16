@@ -43,3 +43,29 @@ export interface Relationship {
   rel_type: RelationshipType;
   is_primary: boolean;
 }
+
+export type RegionCode = "BAC" | "TRUNG" | "NAM";
+
+export interface BranchProfile {
+  id: string;
+  name: string;
+  region_code: RegionCode;
+  language_code: string;
+  parent_profile_id?: string;
+  notes?: string;
+}
+
+export interface BranchRoot {
+  id: string;
+  branch_profile_id: string;
+  root_person_id: string;
+}
+
+export type BranchLinkSource = "DERIVED" | "MANUAL";
+
+export interface PersonBranchLink {
+  id: string;
+  person_id: string;
+  branch_profile_id: string;
+  source: BranchLinkSource;
+}

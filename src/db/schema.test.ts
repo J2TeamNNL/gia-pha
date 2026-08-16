@@ -54,9 +54,31 @@ describe("database schema", () => {
       1,
       2,
       3,
+      4,
     ]);
     expect(migrationsAfter(LATEST_SCHEMA_VERSION)).toEqual([]);
     expect(() => migrationsAfter(99)).toThrow("Unsupported schema version");
+  });
+
+  it("applies migration 4 cleanly on an existing version 3 database", () => {
+    const statements: string[] = [];
+    let version = 3;
+
+    applyMigrations({
+      getUserVersion: () => version,
+      exec: (statement) => statements.push(statement),
+      setUserVersion: (nextVersion) => {
+        version = nextVersion;
+      },
+      now: () => "2026-08-16T00:00:00.000Z",
+    });
+
+    expect(version).toBe(4);
+    expect(statements.join("\n")).toContain("CREATE TABLE IF NOT EXISTS branch_profiles");
+    expect(statements.join("\n")).toContain("CREATE TABLE IF NOT EXISTS branch_roots");
+    expect(statements.join("\n")).toContain("CREATE TABLE IF NOT EXISTS person_branch_links");
+    expect(statements).toContain("COMMIT");
+    expect(statements).not.toContain("ROLLBACK");
   });
 
   it("rolls back a failed migration without advancing its version", () => {
@@ -98,8 +120,8 @@ describe("database schema", () => {
     });
 
     expect(version).toBe(LATEST_SCHEMA_VERSION);
-    expect(statements.filter((statement) => statement === "BEGIN IMMEDIATE")).toHaveLength(3);
-    expect(statements.filter((statement) => statement === "COMMIT")).toHaveLength(3);
+    expect(statements.filter((statement) => statement === "BEGIN IMMEDIATE")).toHaveLength(4);
+    expect(statements.filter((statement) => statement === "COMMIT")).toHaveLength(4);
   });
 
   it("enables foreign key enforcement even when no migrations are pending", () => {
