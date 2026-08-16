@@ -78,6 +78,41 @@ export interface Dictionary {
     closePanel: string;
   };
   personCard: { deceased: string };
+  paste: {
+    open: string;
+    title: string;
+    description: string;
+    formatHint: string;
+    placeholder: string;
+    headerDetected: string;
+    headerAssumed: string;
+    preview: string;
+    previewLimited: string;
+    empty: string;
+    row: string;
+    status: string;
+    ready: string;
+    hasWarning: string;
+    hasError: string;
+    summary: string;
+    importAll: string;
+    importPartial: string;
+    importing: string;
+    close: string;
+    done: string;
+    columns: {
+      fullName: string;
+      gender: string;
+      birthYear: string;
+      deathYear: string;
+      father: string;
+      mother: string;
+      spouse: string;
+      phone: string;
+      address: string;
+      note: string;
+    };
+  };
 }
 
 /**
@@ -180,5 +215,45 @@ export const vi: Dictionary = {
 
   personCard: {
     deceased: "Đã mất",
+  },
+
+  paste: {
+    open: "Dán danh sách",
+    title: "Dán danh sách từ Excel",
+    description:
+      "Sao chép các dòng từ Excel hoặc Google Sheets rồi dán vào ô dưới. Xem trước rồi mới lưu.",
+    formatHint:
+      "Cột: Họ tên, Giới tính, Năm sinh, Cha, Mẹ, Vợ/Chồng. Cha/Mẹ/Vợ/Chồng ghi đúng họ tên của người trong danh sách hoặc đã có trong cây. Trùng tên thì ghi thêm năm sinh trong ngoặc: Nguyễn Văn An (1950).",
+    placeholder: "Dán vào đây…",
+    headerDetected: "Đã nhận ra dòng tiêu đề.",
+    headerAssumed:
+      "Không thấy dòng tiêu đề — đọc theo thứ tự: Họ tên, Giới tính, Năm sinh, Cha, Mẹ, Vợ/Chồng.",
+    preview: "Xem trước",
+    previewLimited:
+      "Chỉ hiện {shown}/{total} dòng đầu; tất cả các dòng vẫn được kiểm tra và lưu.",
+    empty: "Chưa có gì để xem trước.",
+    row: "Dòng",
+    status: "Tình trạng",
+    ready: "Sẵn sàng",
+    hasWarning: "Cần xem lại",
+    hasError: "Lỗi",
+    summary: "{ready} dòng sẵn sàng · {warning} cần xem lại · {error} lỗi",
+    importAll: "Lưu {count} người",
+    importPartial: "Bỏ qua {error} dòng lỗi, lưu {count} người",
+    importing: "Đang lưu…",
+    close: "Đóng",
+    done: "Đã thêm {persons} người và {relationships} quan hệ.",
+    columns: {
+      fullName: "Họ tên",
+      gender: "Giới tính",
+      birthYear: "Năm sinh",
+      deathYear: "Năm mất",
+      father: "Cha",
+      mother: "Mẹ",
+      spouse: "Vợ/Chồng",
+      phone: "Điện thoại",
+      address: "Địa chỉ",
+      note: "Ghi chú",
+    },
   },
 };

@@ -29,6 +29,7 @@ interface TreeState {
   deletePerson: (id: string) => void;
   setRelationships: (rels: Relationship[]) => void;
   addRelationship: (rel: Relationship) => void;
+  addImported: (persons: Person[], relationships: Relationship[]) => void;
   selectPerson: (id: string | null) => void;
   openForm: (
     mode?: "quick" | "full",
@@ -79,6 +80,12 @@ export const useTreeStore = create<TreeState>()(
       setRelationships: (rels) => set({ relationships: rels }),
       addRelationship: (rel) =>
         set((s) => ({ relationships: [...s.relationships, rel] })),
+      addImported: (persons, relationships) =>
+        set((s) => ({
+          persons: [...s.persons, ...persons],
+          relationships: [...s.relationships, ...relationships],
+          isOnboarding: false,
+        })),
 
       selectPerson: (id) => set({ selectedPersonId: id }),
       openForm: (mode = "quick", preFill) =>

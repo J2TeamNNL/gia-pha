@@ -18,12 +18,13 @@ function mapGender(sexValue: string | undefined, lossEntries: LossEntry[], exter
   if (upper === "M") return "MALE";
   if (upper === "F") return "FEMALE";
   if (upper === "X") return "OTHER";
+  if (upper === "U" || !upper) return "UNKNOWN";
   lossEntries.push({
     kind: "lossy_mapping",
-    message: `SEX value ${JSON.stringify(sexValue ?? "")} has no v1 "unknown" gender; mapped to OTHER`,
+    message: `SEX value ${JSON.stringify(sexValue)} is not a recognized code; mapped to UNKNOWN`,
     recordId: externalId,
   });
-  return "OTHER";
+  return "UNKNOWN";
 }
 
 export function mapIndividual(node: GedcomNode): MappedIndividual {

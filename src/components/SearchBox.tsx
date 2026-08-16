@@ -4,23 +4,11 @@ import { useTreeStore } from "@/store/treeStore";
 import { useTranslation } from "@/i18n/useTranslation";
 import type { Person } from "@/db/types";
 import { cn } from "@/lib/utils";
+import { displayName, normalizeName } from "@/lib/personName";
 
-/** Lowercase and strip Vietnamese diacritics so "nguyen" matches "Nguyễn". */
-export function normalizeForSearch(value: string): string {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/đ/g, "d")
-    .replace(/Đ/g, "d")
-    .toLowerCase()
-    .trim();
-}
+/** Kept as a named export because the search test and callers use this name. */
+export const normalizeForSearch = normalizeName;
 
-function displayName(person: Person): string {
-  return [person.last_name, person.middle_name, person.first_name]
-    .filter(Boolean)
-    .join(" ");
-}
 
 export function searchPersons(persons: readonly Person[], query: string): Person[] {
   const needle = normalizeForSearch(query);

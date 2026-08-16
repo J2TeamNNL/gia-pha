@@ -6,9 +6,16 @@ import { SearchBox } from "@/components/SearchBox";
 import { SidePanel } from "@/components/SidePanel";
 import { OnboardingScreen } from "@/components/OnboardingScreen";
 import { TreeCatalog } from "@/components/TreeCatalog";
+import { PasteImport } from "@/components/PasteImport";
 import { useTreeStore } from "@/store/treeStore";
 import { useTranslation } from "@/i18n/useTranslation";
-import { FolderTree, Globe, Plus, TreePine } from "lucide-react";
+import {
+  ClipboardPaste,
+  FolderTree,
+  Globe,
+  Plus,
+  TreePine,
+} from "lucide-react";
 import type { Locale } from "@/i18n";
 import {
   createTree,
@@ -42,7 +49,10 @@ export default function Home() {
   const [catalogBusy, setCatalogBusy] = useState(false);
   const [catalogError, setCatalogError] = useState<string>();
   const [catalogVisible, setCatalogVisible] = useState(false);
+  const [pasteVisible, setPasteVisible] = useState(false);
   const showOnboarding = isOnboarding && persons.length === 0;
+  const showsWorkspaceActions =
+    Boolean(activeTreeId) && !catalogVisible && !pasteVisible;
 
   useEffect(() => {
     const error = getDatabaseRuntimeError()?.message;
@@ -138,10 +148,25 @@ export default function Home() {
         </div>
 
         <div className="flex items-center gap-2">
-          {activeTreeId && !catalogVisible && !showOnboarding && <SearchBox />}
+          {showsWorkspaceActions && !showOnboarding && <SearchBox />}
+          {activeTreeId && !catalogVisible && (
+            <button
+              type="button"
+              onClick={() => setPasteVisible((visible) => !visible)}
+              className="flex items-center gap-1.5 border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-sm px-3 py-2 rounded-full transition-colors"
+              aria-pressed={pasteVisible}
+              aria-label={t.paste.open}
+            >
+              <ClipboardPaste className="size-4" />
+              <span className="hidden sm:inline">{t.paste.open}</span>
+            </button>
+          )}
           <button
             type="button"
-            onClick={() => setCatalogVisible((visible) => !visible)}
+            onClick={() => {
+              setPasteVisible(false);
+              setCatalogVisible((visible) => !visible);
+            }}
             className="flex items-center gap-1.5 border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-sm px-3 py-2 rounded-full transition-colors"
             aria-pressed={catalogVisible}
             aria-label={t.header.treeCatalog}
@@ -167,7 +192,7 @@ export default function Home() {
             ))}
           </div>
 
-          {activeTreeId && !catalogVisible && !showOnboarding && (
+          {showsWorkspaceActions && !showOnboarding && (
             <button
               onClick={() => openForm("quick")}
               className="flex items-center gap-1.5 bg-stone-800 hover:bg-stone-700 text-white text-sm font-medium px-4 py-2 rounded-full transition-colors shadow-sm"
@@ -227,6 +252,8 @@ export default function Home() {
               })
             }
           />
+        ) : pasteVisible ? (
+          <PasteImport onClose={() => setPasteVisible(false)} />
         ) : showOnboarding ? (
           <OnboardingScreen />
         ) : (

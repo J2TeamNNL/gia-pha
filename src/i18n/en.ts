@@ -93,4 +93,44 @@ export const en: Dictionary = {
   personCard: {
     deceased: "Deceased",
   },
+
+  paste: {
+    open: "Paste a list",
+    title: "Paste a list from a spreadsheet",
+    description:
+      "Copy rows out of Excel or Google Sheets and paste them below. Review the preview before saving.",
+    formatHint:
+      "Columns: Full name, Gender, Birth year, Father, Mother, Spouse. Name parents and partners exactly as they appear in this list or already in the tree. When a name repeats, add the birth year in brackets: Nguyễn Văn An (1950).",
+    placeholder: "Paste here…",
+    headerDetected: "Header row recognised.",
+    headerAssumed:
+      "No header row found — reading columns in order: Full name, Gender, Birth year, Father, Mother, Spouse.",
+    preview: "Preview",
+    previewLimited:
+      "Showing the first {shown} of {total} rows; every row is still checked and saved.",
+    empty: "Nothing to preview yet.",
+    row: "Row",
+    status: "Status",
+    ready: "Ready",
+    hasWarning: "Needs a look",
+    hasError: "Error",
+    summary: "{ready} ready · {warning} need a look · {error} with errors",
+    importAll: "Save {count} people",
+    importPartial: "Skip {error} failing rows, save {count} people",
+    importing: "Saving…",
+    close: "Close",
+    done: "Added {persons} people and {relationships} relationships.",
+    columns: {
+      fullName: "Full name",
+      gender: "Gender",
+      birthYear: "Birth year",
+      deathYear: "Death year",
+      father: "Father",
+      mother: "Mother",
+      spouse: "Spouse",
+      phone: "Phone",
+      address: "Address",
+      note: "Notes",
+    },
+  },
 };

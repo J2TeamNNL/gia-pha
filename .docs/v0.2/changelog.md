@@ -4,6 +4,45 @@
 
 This log records both implementation and durable documentation changes. Dates use `YYYY-MM-DD`.
 
+## 2026-08-16 - Paste a family list straight out of a spreadsheet
+
+**What**
+
+- `ENT-001`: `src/io/paste/` — `parseTable` (tab-separated paste or quoted CSV), `mapColumns`
+  (diacritic-insensitive Vietnamese and English headers, with a documented default order
+  when no header is present), and `planPaste`, which produces a per-row plan carrying the
+  person, the resolved parent/spouse links, and the issues found.
+- `src/components/PasteImport.tsx` — a full-view paste box with a live preview table, per-row
+  errors and warnings, and a commit button that names exactly how many rows it will skip.
+- `src/lib/personName.ts` — `normalizeName`, `displayName`, and `splitFullName` lifted out of
+  `SearchBox.tsx` so the importer can share them without a UI import.
+- `Gender` now includes `UNKNOWN`, which the schema CHECK constraint always allowed and the
+  kinship engine always expected. GEDCOM `SEX U` maps to it instead of being flattened to
+  `OTHER` with a loss entry.
+
+**Why**
+
+- The founder is entering 200–1000 people by hand and from spreadsheets, so this is the
+  path onto which every later feature depends.
+- Parents and partners are named rather than keyed, because that is what a human types.
+  A name matching two people is therefore an error the user resolves with a bracketed birth
+  year, never a guess — the same doctrine ADR-013 applies to seniority.
+- Rows with errors are excluded from the commit rather than silently repaired, and the
+  button says how many are being skipped, so a partial import is always a stated choice.
+
+**Impact**
+
+- 88 tests across 15 files; lint, typecheck, and production build all pass.
+- `Gender` gaining a member changes no existing call site; the gender pickers simply do not
+  offer `UNKNOWN` as a choice.
+- One GEDCOM loss-entry message changed wording, and `SEX U` no longer produces a loss entry
+  at all, because the mapping is no longer lossy.
+
+**References**
+
+- `src/io/paste/{table.ts,columns.ts,plan.ts,plan.test.ts}`, `src/components/PasteImport.tsx`
+- `src/lib/personName.ts`, `src/store/treeStore.ts` (`addImported`), `tasks.md` `ENT-001`
+
 ## 2026-08-16 - Transactional bulk writes, and a backlog reordered around two deadlines
 
 **What**

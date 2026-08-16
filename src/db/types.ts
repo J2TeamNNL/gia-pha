@@ -1,4 +1,4 @@
-export type Gender = "MALE" | "FEMALE" | "OTHER";
+export type Gender = "MALE" | "FEMALE" | "OTHER" | "UNKNOWN";
 
 export interface Person {
   id: string;
