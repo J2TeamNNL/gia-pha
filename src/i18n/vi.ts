@@ -47,7 +47,24 @@ export interface Dictionary {
     firstNamePlaceholder: string;
     phonePlaceholder: string;
     notePlaceholder: string;
-    errors: { nameRequired: string; genericError: string };
+    unknownGender: string;
+    saveAndNext: string;
+    savedNotice: string;
+    relationLabel: string;
+    relationNone: string;
+    relParent: string;
+    relChild: string;
+    relSpouse: string;
+    relSibling: string;
+    titleParent: string;
+    titleChild: string;
+    titleSpouse: string;
+    titleSibling: string;
+    errors: {
+      nameRequired: string;
+      genericError: string;
+      siblingNeedsParent: string;
+    };
   };
   canvas: {
     emptyTitle: string;
@@ -172,9 +189,24 @@ export const vi: Dictionary = {
     firstNamePlaceholder: "vd: An",
     phonePlaceholder: "912 345 678",
     notePlaceholder: "Thêm ghi chú...",
+    unknownGender: "Chưa rõ",
+    saveAndNext: "Lưu và thêm tiếp",
+    savedNotice: "Đã lưu {name}.",
+    relationLabel: "Quan hệ với {name}",
+    relationNone: "Không nối quan hệ",
+    relParent: "Cha/Mẹ",
+    relChild: "Con",
+    relSpouse: "Vợ/Chồng",
+    relSibling: "Anh/Chị/Em",
+    titleParent: "Thêm cha/mẹ",
+    titleChild: "Thêm con cái",
+    titleSpouse: "Thêm vợ/chồng",
+    titleSibling: "Thêm anh/chị/em",
     errors: {
       nameRequired: "Vui lòng nhập ít nhất Tên.",
       genericError: "Đã có lỗi xảy ra.",
+      siblingNeedsParent:
+        "Chưa biết cha/mẹ của {name}. Hãy thêm cha hoặc mẹ trước, anh/chị/em sẽ tự nối qua đó.",
     },
   },
 

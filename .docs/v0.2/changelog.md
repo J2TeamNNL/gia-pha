@@ -4,6 +4,42 @@
 
 This log records both implementation and durable documentation changes. Dates use `YYYY-MM-DD`.
 
+## 2026-08-16 - Faster in-app entry, and siblings that actually link
+
+**What**
+
+- `ENT-002`: `QuickAddForm` gains a "Lưu và thêm tiếp" action (also `Ctrl`/`Cmd`+`Enter`)
+  that saves, keeps the surname, gender, and relationship, clears the given name, and
+  returns focus there — so a run of children is typed without touching the mouse.
+- The relationship to the person in focus is now shown and editable in the form rather than
+  being fixed by however the form was opened, and defaults from the selected person.
+- `linksForRelation` in `src/db/bulk.ts` turns that choice into edges, and the form commits
+  the person and the edges through `bulkImport` in one transaction.
+- `QuickAddForm` now reads every string from the i18n dictionaries, and offers `UNKNOWN`
+  gender as an explicit choice.
+
+**Why**
+
+- Entering 200–1000 people one at a time is the actual bottleneck, and the previous form
+  closed after every save.
+- Choosing "Thêm anh/chị/em" previously wrote a `console.warn` and created no relationship
+  at all — a silent no-op. Siblings are now linked through the target's parents, which is
+  what the graph layout and the kinship resolver already read. When no parent is known the
+  form says so and refuses, instead of appearing to succeed.
+- The form previously wrote a person and then its relationships as separate statements, so
+  a failure between them left an orphan. One `bulkImport` call cannot half-apply.
+
+**Impact**
+
+- A spouse now produces one `SPOUSE` row rather than two. Both the layout and the kinship
+  graph already treat the edge as undirected, so the second row only ever duplicated work;
+  trees created before this change still render correctly.
+- 94 tests across 15 files; lint, typecheck, and production build pass.
+
+**References**
+
+- `src/components/QuickAddForm.tsx`, `src/db/bulk.ts` (`linksForRelation`), `tasks.md` `ENT-002`
+
 ## 2026-08-16 - Paste a family list straight out of a spreadsheet
 
 **What**

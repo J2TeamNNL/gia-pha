@@ -37,6 +37,44 @@ export interface BulkImportResult {
   idByExternalId: Record<string, string>;
 }
 
+export type RelationKind = "parent" | "child" | "spouse" | "sibling" | "none";
+
+/**
+ * Translates "add a relative of this person" into stored edges.
+ * Siblings get no edge of their own: they are linked to the target's parents,
+ * which is what both the graph layout and the kinship resolver read.
+ */
+export function linksForRelation(
+  relation: RelationKind,
+  newExternalId: string,
+  targetId: string | null,
+  parentIdsOfTarget: readonly string[] = [],
+): BulkRelationship[] {
+  if (!targetId || relation === "none") return [];
+  const link = (
+    personId: string,
+    relatedToId: string,
+    relType: RelationshipType,
+  ): BulkRelationship => ({
+    person_external_id: personId,
+    related_to_external_id: relatedToId,
+    rel_type: relType,
+  });
+
+  switch (relation) {
+    case "parent":
+      return [link(newExternalId, targetId, "PARENT_OF")];
+    case "child":
+      return [link(targetId, newExternalId, "PARENT_OF")];
+    case "spouse":
+      return [link(newExternalId, targetId, "SPOUSE")];
+    case "sibling":
+      return parentIdsOfTarget.map((parentId) =>
+        link(parentId, newExternalId, "PARENT_OF"),
+      );
+  }
+}
+
 export class BulkImportError extends Error {
   constructor(
     readonly relationshipIndex: number,

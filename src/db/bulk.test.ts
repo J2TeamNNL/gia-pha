@@ -168,3 +168,47 @@ describe("bulkImport", () => {
     ).rejects.toMatchObject({ relationshipIndex: 0 });
   });
 });
+
+describe("linksForRelation", () => {
+  it("makes the new person a parent of the target", async () => {
+    const { linksForRelation } = await import("./bulk");
+    expect(linksForRelation("parent", "new", "target")).toEqual([
+      {
+        person_external_id: "new",
+        related_to_external_id: "target",
+        rel_type: "PARENT_OF",
+      },
+    ]);
+  });
+
+  it("makes the target a parent of the new person", async () => {
+    const { linksForRelation } = await import("./bulk");
+    expect(linksForRelation("child", "new", "target")[0]).toMatchObject({
+      person_external_id: "target",
+      related_to_external_id: "new",
+    });
+  });
+
+  it("emits a single spouse edge", async () => {
+    const { linksForRelation } = await import("./bulk");
+    expect(linksForRelation("spouse", "new", "target")).toHaveLength(1);
+  });
+
+  it("links a sibling through every parent of the target", async () => {
+    const { linksForRelation } = await import("./bulk");
+    const links = linksForRelation("sibling", "new", "target", ["dad", "mum"]);
+    expect(links.map((link) => link.person_external_id)).toEqual(["dad", "mum"]);
+    expect(links.every((link) => link.related_to_external_id === "new")).toBe(true);
+  });
+
+  it("produces nothing for a sibling whose target has no known parent", async () => {
+    const { linksForRelation } = await import("./bulk");
+    expect(linksForRelation("sibling", "new", "target", [])).toEqual([]);
+  });
+
+  it("produces nothing without a target or when no relationship is wanted", async () => {
+    const { linksForRelation } = await import("./bulk");
+    expect(linksForRelation("child", "new", null)).toEqual([]);
+    expect(linksForRelation("none", "new", "target")).toEqual([]);
+  });
+});

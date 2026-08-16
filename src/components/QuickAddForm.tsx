@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { User, ChevronDown, Loader2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTreeStore } from "@/store/treeStore";
-import { createPerson, createRelationship } from "@/db/persons";
+import { bulkImport, linksForRelation, type RelationKind } from "@/db/bulk";
 import type { Gender } from "@/db/types";
+import { displayName } from "@/lib/personName";
+import { useTranslation } from "@/i18n/useTranslation";
 import { cn } from "@/lib/utils";
 import { PhoneInput } from "./PhoneInput";
 
@@ -16,18 +18,28 @@ interface QuickAddFormProps {
   onClose: () => void;
 }
 
+const PARENT_TYPES = new Set(["PARENT_OF", "ADOPTED_PARENT_OF"]);
+const NEW_PERSON = "new-person";
+
 export function QuickAddForm({ onClose }: QuickAddFormProps) {
   const {
-    addPerson,
     frequentlyUsedFields,
     trackFieldUsage,
     formMode,
     openForm,
     persons,
+    relationships,
     anchorPersonId,
+    selectedPersonId,
     formPreFill,
-    addRelationship,
+    addImported,
   } = useTreeStore();
+  const t = useTranslation();
+
+  const relationTargetId = formPreFill?.targetId ?? selectedPersonId;
+  const relationTarget = persons.find(
+    (person) => person.id === relationTargetId,
+  );
 
   const [lastName, setLastName] = useState("");
   const [middleName, setMiddleName] = useState("");
@@ -35,151 +47,206 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
   const [gender, setGender] = useState<Gender>("MALE");
   const [phoneLocal, setPhoneLocal] = useState("");
   const [note, setNote] = useState("");
+  const [relation, setRelation] = useState<RelationKind>(
+    formPreFill?.relType ?? (relationTarget ? "child" : "none"),
+  );
   const [showAdvanced, setShowAdvanced] = useState(formMode === "full");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [savedNotice, setSavedNotice] = useState<string | null>(null);
+  const givenNameRef = useRef<HTMLInputElement>(null);
 
   const hasSavedPhone = frequentlyUsedFields.includes("phone_number");
 
-  // Build unique surname suggestions from existing persons, anchor name first
-  const surnameSuggestions = (() => {
-    const anchor = persons.find((p) => p.id === anchorPersonId);
-    const allLastNames = persons
-      .map((p) => p.last_name)
-      .filter(Boolean) as string[];
-    const unique = [...new Set(allLastNames)];
-    if (anchor?.last_name) {
-      // put anchor's surname first
-      return [
-        anchor.last_name,
-        ...unique.filter((n) => n !== anchor.last_name),
-      ];
-    }
-    return unique;
-  })();
+  const surnameSuggestions = useMemo(() => {
+    const anchor = persons.find((person) => person.id === anchorPersonId);
+    const unique = [
+      ...new Set(
+        persons
+          .map((person) => person.last_name)
+          .filter((name): name is string => Boolean(name)),
+      ),
+    ];
+    if (!anchor?.last_name) return unique;
+    return [
+      anchor.last_name,
+      ...unique.filter((name) => name !== anchor.last_name),
+    ];
+  }, [persons, anchorPersonId]);
 
-  const fullPhoneNumber = phoneLocal.trim()
-    ? `+84${phoneLocal.replace(/^0/, "").replace(/\D/g, "")}`
-    : undefined;
+  const parentIdsOfTarget = useMemo(
+    () =>
+      relationships
+        .filter(
+          (relationship) =>
+            PARENT_TYPES.has(relationship.rel_type) &&
+            relationship.related_to_id === relationTargetId,
+        )
+        .map((relationship) => relationship.person_id),
+    [relationships, relationTargetId],
+  );
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const fill = (template: string, name: string) =>
+    template.replace("{name}", name);
+
+  const save = async (keepOpen: boolean) => {
     if (!firstName.trim()) {
-      setError("Vui lòng nhập ít nhất Tên.");
+      setError(t.form.errors.nameRequired);
       return;
     }
+    if (
+      relation === "sibling" &&
+      relationTarget &&
+      !parentIdsOfTarget.length
+    ) {
+      setError(
+        fill(t.form.errors.siblingNeedsParent, displayName(relationTarget)),
+      );
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     try {
-      const newPerson = await createPerson({
-        first_name: firstName.trim(),
-        last_name: lastName.trim() || undefined,
-        middle_name: middleName.trim() || undefined,
-        gender,
-        is_living: true,
-        phone_number: fullPhoneNumber,
-        notes: note.trim() || undefined,
+      const phoneNumber = phoneLocal.trim()
+        ? `+84${phoneLocal.replace(/^0/, "").replace(/\D/g, "")}`
+        : undefined;
+      const result = await bulkImport({
+        persons: [
+          {
+            externalId: NEW_PERSON,
+            first_name: firstName.trim(),
+            last_name: lastName.trim() || undefined,
+            middle_name: middleName.trim() || undefined,
+            gender,
+            is_living: true,
+            phone_number: phoneNumber,
+            notes: note.trim() || undefined,
+          },
+        ],
+        relationships: linksForRelation(
+          relation,
+          NEW_PERSON,
+          relationTargetId,
+          parentIdsOfTarget,
+        ),
       });
-      addPerson(newPerson);
-
-      // Add relationship if prefilled
-      if (formPreFill) {
-        let rel1, rel2;
-        switch (formPreFill.relType) {
-          case "parent":
-            // newPerson is parent of targetId
-            rel1 = await createRelationship(
-              newPerson.id,
-              formPreFill.targetId,
-              "PARENT_OF",
-            );
-            break;
-          case "child":
-            // targetId is parent of newPerson
-            rel1 = await createRelationship(
-              formPreFill.targetId,
-              newPerson.id,
-              "PARENT_OF",
-            );
-            break;
-          case "spouse":
-            rel1 = await createRelationship(
-              newPerson.id,
-              formPreFill.targetId,
-              "SPOUSE",
-            );
-            rel2 = await createRelationship(
-              formPreFill.targetId,
-              newPerson.id,
-              "SPOUSE",
-            );
-            break;
-          case "sibling":
-            // Sibling relationships are implicit through shared parents in standard genealogy,
-            // but for a quick MVP we might just want them linked if we don't have parents yet.
-            // Leaving unimplemented in DB for now to avoid schema drift, or could add "SIBLING" to types.ts later.
-            console.warn(
-              "Sibling direct relationship not yet supported by DB schema.",
-            );
-            break;
-        }
-        if (rel1) addRelationship(rel1);
-        if (rel2) addRelationship(rel2);
-      }
-
+      addImported(result.persons, result.relationships);
       if (phoneLocal.trim()) trackFieldUsage("phone_number");
-      onClose();
-    } catch (err) {
-      setError((err as Error).message || "Đã có lỗi xảy ra.");
+
+      if (!keepOpen) {
+        onClose();
+        return;
+      }
+      setSavedNotice(fill(t.form.savedNotice, displayName(result.persons[0])));
+      setMiddleName("");
+      setFirstName("");
+      setPhoneLocal("");
+      setNote("");
+      givenNameRef.current?.focus();
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : t.form.errors.genericError,
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
+  const title = relationTarget
+    ? {
+        parent: t.form.titleParent,
+        child: t.form.titleChild,
+        spouse: t.form.titleSpouse,
+        sibling: t.form.titleSibling,
+        none: t.form.addMember,
+      }[relation]
+    : t.form.addMember;
+
+  const RELATIONS: { kind: RelationKind; label: string }[] = [
+    { kind: "child", label: t.form.relChild },
+    { kind: "parent", label: t.form.relParent },
+    { kind: "spouse", label: t.form.relSpouse },
+    { kind: "sibling", label: t.form.relSibling },
+    { kind: "none", label: t.form.relationNone },
+  ];
+
+  const GENDERS: { value: Gender; label: string }[] = [
+    { value: "MALE", label: t.form.male },
+    { value: "FEMALE", label: t.form.female },
+    { value: "UNKNOWN", label: t.form.unknownGender },
+  ];
+
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={(event) => {
+        event.preventDefault();
+        void save(false);
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+          event.preventDefault();
+          void save(true);
+        }
+      }}
       className="flex flex-col gap-4"
       autoComplete="on"
     >
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-stone-700">
           <User className="size-4" />
-          <span className="font-semibold text-base">
-            {!formPreFill && "Thêm thành viên"}
-            {formPreFill?.relType === "parent" && "Thêm cha/mẹ"}
-            {formPreFill?.relType === "child" && "Thêm con cái"}
-            {formPreFill?.relType === "spouse" && "Thêm vợ/chồng"}
-            {formPreFill?.relType === "sibling" && "Thêm anh/chị/em"}
-          </span>
+          <span className="font-semibold text-base">{title}</span>
         </div>
         <button
           type="button"
           onClick={onClose}
           className="text-stone-400 hover:text-stone-600 transition-colors"
+          aria-label={t.form.cancel}
         >
           <X className="size-5" />
         </button>
       </div>
 
-      {/* datalist for surname suggestions */}
+      {relationTarget && (
+        <div className="space-y-1.5">
+          <Label>{fill(t.form.relationLabel, displayName(relationTarget))}</Label>
+          <div className="flex flex-wrap gap-1.5">
+            {RELATIONS.map(({ kind, label }) => (
+              <button
+                key={kind}
+                type="button"
+                onClick={() => setRelation(kind)}
+                aria-pressed={relation === kind}
+                className={cn(
+                  "rounded-lg border px-2.5 py-1.5 text-xs font-medium transition-colors",
+                  relation === kind
+                    ? "bg-stone-800 text-white border-stone-800"
+                    : "bg-white text-stone-600 border-stone-200 hover:bg-stone-50",
+                )}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {surnameSuggestions.length > 0 && (
         <datalist id="surname-suggestions">
-          {surnameSuggestions.map((s) => (
-            <option key={s} value={s} />
+          {surnameSuggestions.map((suggestion) => (
+            <option key={suggestion} value={suggestion} />
           ))}
         </datalist>
       )}
 
-      {/* Name fields */}
       <div className="space-y-3">
         <div className="space-y-1.5">
           <Label htmlFor="qa-last">
-            Họ
+            {t.form.lastName}
             {surnameSuggestions.length > 0 && (
               <span className="ml-2 text-xs font-normal text-stone-400">
-                (gợi ý: {surnameSuggestions.slice(0, 2).join(", ")})
+                ({t.form.surnameSuggestion}{" "}
+                {surnameSuggestions.slice(0, 2).join(", ")})
               </span>
             )}
           </Label>
@@ -190,39 +257,41 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
             list={
               surnameSuggestions.length > 0 ? "surname-suggestions" : undefined
             }
-            placeholder="vd: Nguyễn / Smith"
+            placeholder={t.form.lastNamePlaceholder}
             value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            autoFocus
+            onChange={(event) => setLastName(event.target.value)}
           />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="qa-middle">
-            Tên đệm{" "}
+            {t.form.middleName}{" "}
             <span className="text-stone-400 text-xs font-normal">
-              (tùy chọn)
+              {t.form.optional}
             </span>
           </Label>
           <Input
             id="qa-middle"
             name="additional-name"
             autoComplete="additional-name"
-            placeholder="vd: Văn / Mary"
+            placeholder={t.form.middleNamePlaceholder}
             value={middleName}
-            onChange={(e) => setMiddleName(e.target.value)}
+            onChange={(event) => setMiddleName(event.target.value)}
           />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="qa-first">
-            Tên <span className="text-red-500">*</span>
+            {t.form.firstName}{" "}
+            <span className="text-red-500">{t.form.required}</span>
           </Label>
           <Input
             id="qa-first"
+            ref={givenNameRef}
             name="given-name"
             autoComplete="given-name"
-            placeholder="vd: An / John"
+            placeholder={t.form.firstNamePlaceholder}
             value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
+            onChange={(event) => setFirstName(event.target.value)}
+            autoFocus
           />
         </div>
         {(lastName || firstName) && (
@@ -231,7 +300,7 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
             animate={{ opacity: 1 }}
             className="text-xs text-stone-400 pl-1"
           >
-            Hiển thị:{" "}
+            {t.form.displayName}{" "}
             <strong className="text-stone-600">
               {[lastName, middleName, firstName].filter(Boolean).join(" ")}
             </strong>
@@ -239,42 +308,40 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
         )}
       </div>
 
-      {/* Gender */}
       <div className="space-y-1.5">
         <Label>
-          Giới tính <span className="text-red-500">*</span>
+          {t.form.gender} <span className="text-red-500">{t.form.required}</span>
         </Label>
         <div className="flex gap-2">
-          {(["MALE", "FEMALE"] as Gender[]).map((g) => (
+          {GENDERS.map(({ value, label }) => (
             <button
-              key={g}
+              key={value}
               type="button"
-              onClick={() => setGender(g)}
+              onClick={() => setGender(value)}
+              aria-pressed={gender === value}
               className={cn(
                 "flex-1 py-2 rounded-lg border text-sm font-medium transition-colors",
-                gender === g
+                gender === value
                   ? "bg-stone-800 text-white border-stone-800"
                   : "bg-white text-stone-600 border-stone-200 hover:bg-stone-50",
               )}
             >
-              {g === "MALE" ? "🙎‍♂️ Nam" : "🙎‍♀️ Nữ"}
+              {label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Smart Memory phone */}
       {hasSavedPhone && (
         <div className="space-y-1.5">
-          <Label>Số điện thoại</Label>
+          <Label>{t.form.phone}</Label>
           <PhoneInput value={phoneLocal} onChange={setPhoneLocal} />
         </div>
       )}
 
-      {/* Toggle Advanced */}
       <button
         type="button"
-        onClick={() => setShowAdvanced((s) => !s)}
+        onClick={() => setShowAdvanced((shown) => !shown)}
         className="flex items-center gap-1.5 text-sm text-stone-500 hover:text-stone-700 transition-colors"
       >
         <ChevronDown
@@ -283,7 +350,7 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
             showAdvanced && "rotate-180",
           )}
         />
-        {showAdvanced ? "Ẩn chi tiết" : "Thêm chi tiết (tùy chọn)"}
+        {showAdvanced ? t.form.hideDetails : t.form.addDetails}
       </button>
 
       <AnimatePresence>
@@ -298,60 +365,86 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
             <div className="flex flex-col gap-4 pt-1">
               {!hasSavedPhone && (
                 <div className="space-y-1.5">
-                  <Label>Số điện thoại</Label>
+                  <Label>{t.form.phone}</Label>
                   <PhoneInput value={phoneLocal} onChange={setPhoneLocal} />
                 </div>
               )}
               <div className="space-y-1.5">
-                <Label htmlFor="qa-note">Ghi chú</Label>
+                <Label htmlFor="qa-note">{t.form.note}</Label>
                 <Input
                   id="qa-note"
-                  placeholder="Thêm ghi chú..."
+                  placeholder={t.form.notePlaceholder}
                   value={note}
-                  onChange={(e) => setNote(e.target.value)}
+                  onChange={(event) => setNote(event.target.value)}
                 />
               </div>
               <p className="text-xs text-stone-400 italic">
-                Chỉnh sửa thêm sau khi lưu.
+                {t.form.editLater}
               </p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
+      {savedNotice && !error && (
+        <p
+          role="status"
+          className="text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2"
+        >
+          {savedNotice}
+        </p>
+      )}
       {error && (
-        <p className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+        <p
+          role="alert"
+          className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2"
+        >
           {error}
         </p>
       )}
 
-      <div className="flex gap-2 pt-2 border-t border-stone-100">
+      <div className="flex flex-col gap-2 pt-2 border-t border-stone-100">
         <Button
           type="button"
-          variant="outline"
-          onClick={onClose}
-          className="flex-1"
-        >
-          Hủy
-        </Button>
-        <Button
-          type="submit"
+          onClick={() => void save(true)}
           disabled={isLoading}
-          className="flex-1 bg-stone-800 hover:bg-stone-700 text-white"
+          variant="outline"
+          className="w-full"
         >
           {isLoading ? (
             <Loader2 className="size-4 animate-spin" />
           ) : (
-            "Lưu thành viên"
+            t.form.saveAndNext
           )}
         </Button>
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={onClose}
+            className="flex-1"
+          >
+            {t.form.cancel}
+          </Button>
+          <Button
+            type="submit"
+            disabled={isLoading}
+            className="flex-1 bg-stone-800 hover:bg-stone-700 text-white"
+          >
+            {isLoading ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              t.form.save
+            )}
+          </Button>
+        </div>
       </div>
       <button
         type="button"
         onClick={() => openForm("full")}
         className="text-center text-xs text-stone-400 hover:text-stone-600 transition-colors underline underline-offset-2"
       >
-        Mở form đầy đủ
+        {t.form.fullForm}
       </button>
     </form>
   );
