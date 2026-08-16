@@ -32,6 +32,7 @@ Status values: `TODO`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `SUPERSEDED`.
 | XH-005 | DONE | P0 | Surface address terms in the workspace | Graph nodes and the side panel show the term for the current reference person, multi-branch nodes show both, and unknown seniority is visibly flagged. |
 | XH-006 | DONE | P0 | Ship the relative list and invitation output | Sortable exportable table of every relative with term, self-reference, branch, and unknown-seniority flag, plus the formal register composed for printed invitations. |
 | XH-007 | DONE | P0 | Join the kinship engine to branch profiles | Given ego and a target, the join loads the target's branch profiles and returns one address resolution per branch, reusing the persons and relationships already held in the store rather than re-querying. |
+| ENT-003 | DONE | P0 | Tell the branches apart on the tree | Each branch carries a distinct accent, cards show their branch's accent, and a legend names them. |
 | XH-008 | DONE | P0 | Build the branch setup interface | A user can name a branch, choose its region, pick root people, and manually assign anyone derivation misses, without leaving the app. |
 
 ## Definition of done

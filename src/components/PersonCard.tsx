@@ -17,6 +17,8 @@ interface PersonCardProps {
   /** True when the person sits in more than one branch. */
   kinshipMultiBranch?: boolean;
   unknownLabel?: string;
+  /** Accent of the branch this person belongs to, for telling sides apart. */
+  branchColor?: string | null;
 }
 
 function getInitials(person: Person) {
@@ -43,6 +45,7 @@ export function PersonCard({
   kinshipUnknown,
   kinshipMultiBranch,
   unknownLabel,
+  branchColor,
 }: PersonCardProps) {
   const isMale = person.gender === "MALE";
   const avatarBg = isMale
@@ -71,6 +74,14 @@ export function PersonCard({
             : "bg-white/80 border-stone-200/60 hover:border-stone-400/60 hover:shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:bg-white",
         )}
       >
+        {branchColor && (
+          <span
+            aria-hidden
+            style={{ backgroundColor: branchColor }}
+            className="absolute inset-x-6 top-0 h-1 rounded-b-full"
+          />
+        )}
+
         {/* Decorative background glow for selected */}
         {isSelected && (
           <div className="absolute inset-0 bg-stone-100 dark:bg-stone-800/5 rounded-3xl -z-10 animate-in fade-in duration-300" />

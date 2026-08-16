@@ -10,6 +10,7 @@ import {
   type LayoutResult,
 } from "@/graph/layout";
 import { usePersonLabels } from "./kinshipLabel";
+import { branchColorMap } from "@/lib/branchColor";
 import { PersonCard } from "@/components/PersonCard";
 
 const MIN_SCALE = 0.2;
@@ -90,6 +91,21 @@ export function GraphView() {
       [layout],
     ),
   );
+
+  const branchProfiles = useTreeStore((state) => state.branchProfiles);
+  const branchLinks = useTreeStore((state) => state.branchLinks);
+  const colorByBranch = useMemo(
+    () => branchColorMap(branchProfiles.map((profile) => profile.id)),
+    [branchProfiles],
+  );
+  const colorByPerson = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const link of branchLinks) {
+      const color = colorByBranch.get(link.branch_profile_id);
+      if (color && !map.has(link.person_id)) map.set(link.person_id, color);
+    }
+    return map;
+  }, [branchLinks, colorByBranch]);
 
   const fitView = useCallback(() => {
     const viewport = viewportRef.current;
@@ -225,6 +241,20 @@ export function GraphView() {
             </>
           )}
         </div>
+        {branchProfiles.length > 0 && (
+          <ul className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-full border border-stone-200/60 bg-white/80 px-4 py-1.5 text-xs text-stone-600 shadow-sm backdrop-blur-md">
+            {branchProfiles.map((profile) => (
+              <li key={profile.id} className="flex items-center gap-1.5">
+                <span
+                  aria-hidden
+                  style={{ backgroundColor: colorByBranch.get(profile.id) }}
+                  className="size-2 rounded-full"
+                />
+                {profile.name}
+              </li>
+            ))}
+          </ul>
+        )}
         {layout.hiddenCount > 0 && (
           <p
             role="status"
@@ -335,6 +365,7 @@ export function GraphView() {
                 (labels.get(node.person.id)?.addresses.length ?? 0) > 1
               }
               unknownLabel={t.kinship.unknown}
+              branchColor={colorByPerson.get(node.person.id) ?? null}
               onClick={() =>
                 selectPerson(
                   node.person.id === selectedPersonId ? null : node.person.id,

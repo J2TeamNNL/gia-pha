@@ -4,6 +4,31 @@
 
 This log records both implementation and durable documentation changes. Dates use `YYYY-MM-DD`.
 
+## 2026-08-16 - Branches are distinguishable at a glance
+
+**What**
+
+- `ENT-003`: `src/lib/branchColor.ts` assigns a distinct accent per branch by list position;
+  `PersonCard` carries it as a thin stripe, and the graph shows a legend naming each branch.
+
+**Why**
+
+- The founder listed "cây dễ nhìn hơn" among what makes entry easier to hold in mind. Once a
+  tree spans a paternal line, a maternal line, and a spouse's family, the sides are the first
+  thing the eye needs to separate.
+- Colour is assigned per branch rather than per region, because two branches from the same
+  region would otherwise render identically — which is exactly the case a Vietnamese tree hits
+  when both sides come from the north.
+
+**Impact**
+
+- 122 tests across 20 files; lint, typecheck, and build pass.
+
+**References**
+
+- `src/lib/{branchColor.ts,branchColor.test.ts}`, `src/components/{PersonCard.tsx,GraphView.tsx}`
+- `tasks.md` `ENT-003`
+
 ## 2026-08-16 - The relative list, and an invitation wording the founder writes
 
 **What**
