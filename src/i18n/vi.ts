@@ -95,6 +95,14 @@ export interface Dictionary {
     closePanel: string;
   };
   personCard: { deceased: string };
+  kinship: {
+    unknown: string;
+    callLabel: string;
+    selfLabel: string;
+    viaSpouse: string;
+    noAnchor: string;
+    defaultBranch: string;
+  };
   branch: {
     open: string;
     title: string;
@@ -281,6 +289,15 @@ export const vi: Dictionary = {
     deceased: "Đã mất",
   },
 
+  kinship: {
+    unknown: "chưa rõ",
+    callLabel: "Gọi",
+    selfLabel: "xưng",
+    viaSpouse: "gọi thay ngôi qua {name}",
+    noAnchor: "Chọn một người làm trung tâm để hiện xưng hô.",
+    defaultBranch: "Chưa thuộc nhánh nào",
+  },
+
   branch: {
     open: "Nhánh",
     title: "Nhánh và cách xưng hô",
@@ -288,7 +305,7 @@ export const vi: Dictionary = {
       "Mỗi nhánh có vùng miền riêng. Cùng một cây có thể vừa có họ nội Quảng Trị, họ ngoại Hà Nội, vừa có bên vợ miền Nam — mỗi bên xưng hô theo giọng của mình.",
     defaultRegion: "Vùng mặc định",
     defaultRegionHint:
-      "Dùng cho người chưa thuộc nhánh nào. Đây là lựa chọn của bạn, không phải phỏng đoán.",
+      "Dùng cho người chưa thuộc nhánh nào. Khi bạn đang nhập liên tục vào một nhánh, vùng sẽ tự đi theo người vừa nhập; lựa chọn dưới đây là mức dự phòng cuối cùng.",
     create: "Thêm nhánh",
     namePlaceholder: "vd: Họ nội (Quảng Trị)",
     region: "Vùng",

@@ -9,6 +9,7 @@ import {
   type LayoutNode,
   type LayoutResult,
 } from "@/graph/layout";
+import { usePersonLabels } from "./kinshipLabel";
 import { PersonCard } from "@/components/PersonCard";
 
 const MIN_SCALE = 0.2;
@@ -80,6 +81,13 @@ export function GraphView() {
     useMemo(
       () => ({ persons, relationships, focusId: focusId ?? anchorPersonId, depth }),
       [persons, relationships, focusId, anchorPersonId, depth],
+    ),
+  );
+
+  const labels = usePersonLabels(
+    useMemo(
+      () => layout?.nodes.map((node) => node.person.id) ?? [],
+      [layout],
     ),
   );
 
@@ -321,6 +329,12 @@ export function GraphView() {
             <PersonCard
               person={node.person}
               isSelected={selectedPersonId === node.person.id}
+              kinshipCall={labels.get(node.person.id)?.call ?? null}
+              kinshipUnknown={labels.get(node.person.id)?.unknown}
+              kinshipMultiBranch={
+                (labels.get(node.person.id)?.addresses.length ?? 0) > 1
+              }
+              unknownLabel={t.kinship.unknown}
               onClick={() =>
                 selectPerson(
                   node.person.id === selectedPersonId ? null : node.person.id,

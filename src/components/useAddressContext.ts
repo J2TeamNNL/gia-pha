@@ -16,6 +16,9 @@ export function useAddressContext(): AddressContext {
   const branchProfiles = useTreeStore((state) => state.branchProfiles);
   const branchLinks = useTreeStore((state) => state.branchLinks);
   const defaultRegion = useTreeStore((state) => state.defaultRegion);
+  const lastEnteredPersonId = useTreeStore(
+    (state) => state.lastEnteredPersonId,
+  );
 
   const kinshipPersons = useMemo<KinshipPerson[]>(
     () =>
@@ -70,20 +73,33 @@ export function useAddressContext(): AddressContext {
     return map;
   }, [branchLinks]);
 
+  // The dialect for unassigned people follows whoever was entered last, so a
+  // run of entries into one side of the family keeps speaking that side's words.
+  const fallbackRegion = useMemo(() => {
+    const branchIds = lastEnteredPersonId
+      ? (branchesByPerson.get(lastEnteredPersonId) ?? [])
+      : [];
+    for (const branchId of branchIds) {
+      const branch = branchesById.get(branchId);
+      if (branch) return branch.regionCode;
+    }
+    return defaultRegion;
+  }, [lastEnteredPersonId, branchesByPerson, branchesById, defaultRegion]);
+
   return useMemo(
     () => ({
       persons: kinshipPersons,
       relationships: kinshipRelationships,
       branchesByPerson,
       branchesById,
-      fallbackRegion: defaultRegion,
+      fallbackRegion,
     }),
     [
       kinshipPersons,
       kinshipRelationships,
       branchesByPerson,
       branchesById,
-      defaultRegion,
+      fallbackRegion,
     ],
   );
 }

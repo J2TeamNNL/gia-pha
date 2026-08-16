@@ -31,6 +31,8 @@ interface TreeState {
   branchLinks: PersonBranchLink[];
   /** Dialect used for anyone who belongs to no branch; user-chosen, not guessed. */
   defaultRegion: RegionCode;
+  /** The newest person entered; the default dialect follows their branch. */
+  lastEnteredPersonId: string | null;
 
   frequentlyUsedFields: string[];
 
@@ -77,6 +79,7 @@ export const useTreeStore = create<TreeState>()(
       branchProfiles: [],
       branchLinks: [],
       defaultRegion: "BAC",
+      lastEnteredPersonId: null,
 
       setPersons: (persons) => set({ persons }),
       addPerson: (person) => set((s) => ({ persons: [...s.persons, person] })),
@@ -104,6 +107,8 @@ export const useTreeStore = create<TreeState>()(
           persons: [...s.persons, ...persons],
           relationships: [...s.relationships, ...relationships],
           isOnboarding: false,
+          lastEnteredPersonId:
+            persons.at(-1)?.id ?? s.lastEnteredPersonId,
         })),
 
       selectPerson: (id) => set({ selectedPersonId: id }),
@@ -127,6 +132,7 @@ export const useTreeStore = create<TreeState>()(
           isOnboarding: true,
           branchProfiles: [],
           branchLinks: [],
+          lastEnteredPersonId: null,
         }),
 
       trackFieldUsage: (fieldName) =>

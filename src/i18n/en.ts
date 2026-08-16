@@ -109,6 +109,15 @@ export const en: Dictionary = {
     deceased: "Deceased",
   },
 
+  kinship: {
+    unknown: "not known",
+    callLabel: "Call",
+    selfLabel: "refer to yourself as",
+    viaSpouse: "spoken from {name}'s position",
+    noAnchor: "Pick a reference person to see address terms.",
+    defaultBranch: "In no branch",
+  },
+
   branch: {
     open: "Branches",
     title: "Branches and how they address each other",
@@ -116,7 +125,7 @@ export const en: Dictionary = {
       "Each branch carries its own region. One tree can hold a Quảng Trị paternal line, a Hà Nội maternal line, and a southern spouse's family, each addressed in its own register.",
     defaultRegion: "Default region",
     defaultRegionHint:
-      "Used for anyone in no branch. This is your choice, not a guess.",
+      "Used for anyone in no branch. While you enter a run of people into one branch the dialect follows them; this setting is the last resort.",
     create: "Add a branch",
     namePlaceholder: "e.g. Paternal line (Quảng Trị)",
     region: "Region",

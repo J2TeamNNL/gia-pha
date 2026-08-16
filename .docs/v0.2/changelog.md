@@ -4,6 +4,39 @@
 
 This log records both implementation and durable documentation changes. Dates use `YYYY-MM-DD`.
 
+## 2026-08-16 - Address terms visible while you enter the tree
+
+**What**
+
+- `XH-005`: graph cards carry the term the reference person uses, rendered as a badge above
+  the name; the side panel lists every applicable branch with the full gọi/xưng pair.
+- `src/components/kinshipLabel.ts` — `usePersonLabels` resolves the whole visible set in one
+  pass, so a card render never triggers its own traversal; `labelFor` picks the first branch
+  that resolved and distinguishes "no term applies" from "data is missing".
+- `KinshipRows` shows a `gọi thay ngôi` line naming whose position the term came from.
+- The default dialect now follows the last person entered rather than a fixed setting; the
+  explicit picker in branch setup is the fallback, and its hint says so.
+
+**Why**
+
+- The founder's stated reason for the feature is being able to picture and remember who is
+  who *while entering the tree*, so the term has to sit on the card during entry rather than
+  only in a report read later.
+- A card is 160px wide, which fits one short word. The badge carries the first branch and a
+  dot marks that more exist; the panel is where a multi-branch person shows every answer.
+- An unresolved term renders as `chưa rõ` in amber, visibly different from a relative who is
+  simply too distant to have one. Only the first is a prompt to supply missing data.
+
+**Impact**
+
+- Cards grow by roughly 18px when a term applies, which lengthens a deep tree slightly.
+- 105 tests across 17 files; lint, typecheck, and build pass.
+
+**References**
+
+- `src/components/{kinshipLabel.ts,kinshipLabel.test.ts,KinshipRows.tsx,PersonCard.tsx,GraphView.tsx,SidePanel.tsx}`
+- `src/store/treeStore.ts` (`lastEnteredPersonId`), `tasks.md` `XH-005`
+
 ## 2026-08-16 - Branch setup, reachable from the app at last
 
 **What**

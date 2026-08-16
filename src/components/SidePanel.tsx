@@ -7,6 +7,7 @@ import { useTreeStore } from "@/store/treeStore";
 import { useTranslation } from "@/i18n/useTranslation";
 import { setAnchorPerson } from "@/db/persons";
 import { QuickAddForm } from "./QuickAddForm";
+import { KinshipRows } from "./KinshipRows";
 import { cn } from "@/lib/utils";
 
 export function SidePanel() {
@@ -117,6 +118,8 @@ export function SidePanel() {
                     )}
                   </div>
                 </div>
+
+                <KinshipRows personId={selectedPerson.id} />
 
                 {!selectedPerson.is_anchor && (
                   <button

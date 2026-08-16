@@ -10,6 +10,13 @@ interface PersonCardProps {
   isSelected?: boolean;
   onClick?: () => void;
   onAddRelative?: (direction: "top" | "bottom" | "left" | "right") => void;
+  /** What the reference person calls them; null when it cannot be resolved. */
+  kinshipCall?: string | null;
+  /** True when the term is unresolved because data is missing, not absent. */
+  kinshipUnknown?: boolean;
+  /** True when the person sits in more than one branch. */
+  kinshipMultiBranch?: boolean;
+  unknownLabel?: string;
 }
 
 function getInitials(person: Person) {
@@ -32,6 +39,10 @@ export function PersonCard({
   isSelected,
   onClick,
   onAddRelative,
+  kinshipCall,
+  kinshipUnknown,
+  kinshipMultiBranch,
+  unknownLabel,
 }: PersonCardProps) {
   const isMale = person.gender === "MALE";
   const avatarBg = isMale
@@ -98,6 +109,21 @@ export function PersonCard({
 
         {/* Name and Details */}
         <div className="w-full text-center space-y-0.5">
+          {(kinshipCall || kinshipUnknown) && (
+            <p
+              className={cn(
+                "mx-auto mb-1 w-fit max-w-full truncate rounded-full px-2 py-0.5 text-[11px] font-bold",
+                kinshipCall
+                  ? "bg-stone-100 text-stone-700"
+                  : "bg-amber-50 text-amber-700",
+              )}
+            >
+              {kinshipCall ?? unknownLabel}
+              {kinshipMultiBranch && kinshipCall && (
+                <span className="ml-1 text-stone-400">•</span>
+              )}
+            </p>
+          )}
           <p className="text-sm font-bold text-stone-800 leading-tight">
             {getDisplayName(person)}
           </p>
