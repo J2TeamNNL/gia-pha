@@ -1,3 +1,5 @@
+<!-- snapshot: v0.1 | frozen: 2026-07-12 | superseded by v0.2 -->
+
 # Architecture Decision Log
 
 | ID | Status | Decision | Reason |

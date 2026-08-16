@@ -1,6 +1,6 @@
 # Gia Phả - Local First Web App
 
-Website quản lý gia phả với mục tiêu bảo mật tối đa, dễ dàng sử dụng và lưu trữ dữ liệu tại cá nhân người dùng. Repository `gia-pha` là nơi phát triển chính thức; các phần prototype được thay thế từng phần ngay trong repository này theo `.plan/`.
+Website quản lý gia phả với mục tiêu bảo mật tối đa, dễ dàng sử dụng và lưu trữ dữ liệu tại cá nhân người dùng. Repository `gia-pha` là nơi phát triển chính thức; các phần prototype được thay thế từng phần ngay trong repository này theo `.docs/`.
 
 ## Trạng thái hiện tại
 
@@ -9,7 +9,7 @@ Website quản lý gia phả với mục tiêu bảo mật tối đa, dễ dàng
 - Baseline lint, typecheck, unit test, build và Playwright đã chạy trong CI.
 - Browser thiếu HTTPS, COOP/COEP, SharedArrayBuffer, Worker hoặc OPFS sẽ thấy lỗi rõ ràng; không fallback sang storage tạm.
 
-Chưa dùng runtime hiện tại để lưu dữ liệu gia phả quan trọng hoặc deploy production cho đến khi các task trong `.plan/task.md` hoàn thành.
+Chưa dùng runtime hiện tại để lưu dữ liệu gia phả quan trọng hoặc deploy production cho đến khi các task trong `.docs/v0.2/tasks.md` hoàn thành.
 
 ## MVP đang xây
 
@@ -37,7 +37,7 @@ Các ý tưởng gốc của dự án, giữ nguyên trên roadmap chính thức
 
 ## Tài liệu
 
-Bắt đầu tại [`.plan/README.md`](.plan/README.md) — dẫn đến product overview, kiến trúc, data model, quyết định, changelog và task backlog.
+Bắt đầu tại [`.docs/README.md`](.docs/README.md) — dẫn đến product overview, kiến trúc, data model, quyết định, changelog và task backlog.
 
 ## Tham khảo
 

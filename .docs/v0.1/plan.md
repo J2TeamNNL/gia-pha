@@ -1,3 +1,5 @@
+<!-- snapshot: v0.1 | frozen: 2026-07-12 | superseded by v0.2 -->
+
 # Roadmap
 
 `CURRENT`: the existing runtime is a legacy prototype. `TARGET`: the phases below replace it in the existing `gia-pha` repository; they do not describe completed behavior.

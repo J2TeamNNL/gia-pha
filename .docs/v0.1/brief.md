@@ -1,3 +1,5 @@
+<!-- snapshot: v0.1 | frozen: 2026-07-12 | superseded by v0.2 -->
+
 # Gia Phả - Product Overview
 
 Status: `TARGET`; this document describes the product being implemented in `gia-pha`, not the current prototype runtime.
