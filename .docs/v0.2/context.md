@@ -24,7 +24,7 @@ Status: `TARGET`; none of this document should be interpreted as implemented in 
 - React Router for workspace/editor/settings routes.
 - TanStack Query for async repository cache; a small UI store only for selection, viewport, and panels.
 - `@sqlite.org/sqlite-wasm` in a dedicated Worker with OPFS persistence.
-- React Flow for interaction/viewport and ELK in a Worker for layered layout with union nodes and ports.
+- A hand-written SVG/DOM canvas for interaction/viewport over a plain layout Worker (ADR-018 supersedes the earlier React Flow + ELK intent).
 - Zod/JSON Schema at I/O boundaries; React Hook Form for forms.
 - Vitest and Playwright for unit/integration/browser coverage.
 

@@ -27,7 +27,7 @@
 - Implement tree, person, family union, partner, child, and event repositories.
 - Add transactions, constraints, migrations, cycle detection, and multi-tree isolation.
 - Build workspace, onboarding, CRUD forms, search, reference-person selection, and responsive side panel.
-- Render focused graph views using React Flow and ELK worker.
+- [x] Render focused graph views on a hand-written canvas over a layout worker (ADR-018).
 
 ## Phase 3 - Interoperability
 
@@ -48,12 +48,29 @@
 
 ---
 
-## Current plan — xưng hô delivery (2026-08-16)
+## Current plan — reordered around the founder's two deadlines (2026-08-16)
 
-`XH-001` … `XH-004` and the GEDCOM import half are landed and green. What follows is the
-accepted plan for the next session.
+Confirmed with the founder on 2026-08-16. The ordering below serves two dated outcomes —
+a wedding invitation list, and being able to address relatives correctly in person at Tết —
+rather than the abstract MVP boundary in `brief.md`.
 
-### Phase A — join the branch layer to the engine (prerequisite)
+Consequences, accepted deliberately:
+
+- `IO-001` and `IO-002` drop to P2. Neither serves either deadline: the founder is typing
+  the tree in by hand and has no file to import from another platform, and GEDCOM export
+  only matters when moving data *out* to Ancestry or MyHeritage. The GEDCOM import half
+  already landed stays where it is, unwired.
+- `XH-005` and `XH-006` rise to P0, and two previously implicit steps become tracked tasks:
+  `XH-007` (the Phase A join) and `XH-008` (the branch setup interface). Without `XH-008`
+  no branch exists, so nothing downstream of it can render a regional term at all.
+- Fast data entry becomes P0 as `ENT-001` and `ENT-002`. The tree is expected to reach
+  200–1000 people, all entered by hand or pasted from a spreadsheet.
+
+Order of work: `DB-001` → `ENT-001`/`ENT-002` → `XH-008` → `XH-007` → `XH-006` → `XH-005`.
+
+`DB-001` is landed. The phase descriptions below remain accurate for the xưng hô half.
+
+### Phase A — join the branch layer to the engine (`XH-007`)
 
 The engine resolves a term for a pair; the branch layer knows which dialect profile applies.
 Nothing connects them yet. Build the join that, given ego and a target, picks the target's

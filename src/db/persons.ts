@@ -7,7 +7,7 @@
 import { v4 as uuidv4 } from "uuid";
 import type { Person, Relationship, RelationshipType } from "./types";
 import { getDb } from "./client";
-import type { QueryResult, SqlValue } from "./client";
+import type { BatchStatement, QueryResult, SqlValue } from "./client";
 import { validateRelationship } from "./validation";
 
 function rowToObject(columns: string[], values: SqlValue[]) {
@@ -69,17 +69,38 @@ const PERSON_COLUMNS = [
   "is_anchor",
 ] as const satisfies readonly (keyof Person)[];
 
+export function buildPersonInsert(person: Person): BatchStatement {
+  const placeholders = PERSON_COLUMNS.map(() => "?").join(", ");
+  return {
+    sql: `INSERT INTO persons (${PERSON_COLUMNS.join(", ")}) VALUES (${placeholders})`,
+    params: PERSON_COLUMNS.map((column) => toSqlValue(person[column])),
+  };
+}
+
+export function buildRelationshipInsert(
+  relationship: Relationship,
+): BatchStatement {
+  return {
+    sql: "INSERT INTO relationships (id, person_id, related_to_id, rel_type, is_primary) VALUES (?,?,?,?,?)",
+    params: [
+      relationship.id,
+      relationship.person_id,
+      relationship.related_to_id,
+      relationship.rel_type,
+      relationship.is_primary ? 1 : 0,
+    ],
+  };
+}
+
 export async function createPerson(data: Omit<Person, "id">): Promise<Person> {
   const db = await getDb();
-  const id = uuidv4();
-  const person: Person = { ...data, id, is_anchor: data.is_anchor ?? false };
-
-  const placeholders = PERSON_COLUMNS.map(() => "?").join(", ");
-  const params = PERSON_COLUMNS.map((column) => toSqlValue(person[column]));
-  await db.run(
-    `INSERT INTO persons (${PERSON_COLUMNS.join(", ")}) VALUES (${placeholders})`,
-    params,
-  );
+  const person: Person = {
+    ...data,
+    id: uuidv4(),
+    is_anchor: data.is_anchor ?? false,
+  };
+  const statement = buildPersonInsert(person);
+  await db.run(statement.sql, statement.params);
   return person;
 }
 
@@ -150,16 +171,8 @@ export async function createRelationship(
     rel_type: relType,
     is_primary: isPrimary,
   };
-  await db.run(
-    "INSERT INTO relationships (id, person_id, related_to_id, rel_type, is_primary) VALUES (?,?,?,?,?)",
-    [
-      rel.id,
-      rel.person_id,
-      rel.related_to_id,
-      rel.rel_type,
-      rel.is_primary ? 1 : 0,
-    ],
-  );
+  const statement = buildRelationshipInsert(rel);
+  await db.run(statement.sql, statement.params);
   return rel;
 }
 

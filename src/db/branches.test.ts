@@ -63,6 +63,7 @@ function createFakeDb(seed: { relationships?: Row[]; branchRoots?: Row[] } = {})
       }
       throw new Error(`Unexpected run: ${sql}`);
     },
+    batch: vi.fn(),
     close: vi.fn(),
     listTrees: vi.fn(),
     createTree: vi.fn(),

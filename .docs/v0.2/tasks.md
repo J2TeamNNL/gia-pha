@@ -17,8 +17,11 @@ Status values: `TODO`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `SUPERSEDED`.
 | DOM-002 | DONE | P0 | Implement genealogy validation | Reject self-links, duplicate memberships, invalid parent cycles, and dangling references with actionable errors. |
 | UI-001 | DONE | P0 | Build workspace and editor shell | Mobile/desktop workspace, search, side panel, and reference-person selection are keyboard accessible. |
 | UI-002 | DONE | P0 | Build graph rendering | Correct union/parent-child graph, focus/depth controls, pan/zoom, worker layout, and 500-visible-node guard. |
-| IO-001 | TODO | P0 | Publish Native JSON v1 | Versioned JSON Schema, validator, deterministic export, and import/export round-trip tests exist. |
-| IO-002 | IN_PROGRESS | P0 | Implement GEDCOM adapters | Supported versions import/export with fixtures; unknown extensions survive or appear in a loss report. Back in MVP scope 2026-08-16 (ADR-015). **Import path done** (`src/io/gedcom/`, parser + mapping + loss report, not yet wired to the DB or UI); **export not started**. |
+| DB-001 | DONE | P0 | Add a transactional bulk write path | One `batch` worker command commits many statements under `BEGIN IMMEDIATE`; `bulkImport` mints ids, resolves caller-supplied `externalId` references, validates every relationship before sending, and rolls the whole batch back on the first offending row. |
+| ENT-001 | TODO | P0 | Accept a pasted list from a spreadsheet | A pasted table maps to people and parent/spouse links, shows a per-row preview with errors before anything is written, and commits through `DB-001` in one transaction. |
+| ENT-002 | TODO | P0 | Speed up in-app entry | Adding a relative keeps the form open for the next one, supports keyboard-only completion, and defaults the relationship from the person in focus. |
+| IO-001 | TODO | P2 | Publish Native JSON v1 | Versioned JSON Schema, validator, deterministic export, and import/export round-trip tests exist. |
+| IO-002 | IN_PROGRESS | P2 | Implement GEDCOM adapters | Supported versions import/export with fixtures; unknown extensions survive or appear in a loss report. Back in MVP scope 2026-08-16 (ADR-015). **Import path done** (`src/io/gedcom/`, parser + mapping + loss report, not yet wired to the DB or UI); **export not started**. |
 | PRIV-001 | TODO | P0 | Enforce local-only privacy | No telemetry or automatic report; network tests prove family payloads never leave the browser. |
 | PERF-001 | TODO | P1 | Meet scale target | CRUD/search/import benchmarks pass with 10,000 people and graph stays usable with 500 visible nodes. |
 | REL-001 | TODO | P1 | Prepare first public release | Changelog, version, build SHA, source link, browser support, and privacy limitations are visible. |
@@ -26,8 +29,10 @@ Status values: `TODO`, `IN_PROGRESS`, `BLOCKED`, `DONE`, `SUPERSEDED`.
 | XH-002 | DONE | P1 | Implement seniority resolution | `birth_order`, then birth date fields, then `UNKNOWN`; comparison is against the connecting relative, and an unresolved case never renders a guessed term. |
 | XH-003 | DONE | P1 | Build regional address dictionaries | `BAC`, `TRUNG`, `NAM` dictionaries return gọi/xưng pairs in spoken, formal, and reference registers; provincial overrides inherit their parent profile; southern birth-order offset applies. |
 | XH-004 | DONE | P1 | Implement branch profiles and membership | Branch roots derive descendant and married-in membership, manual assignment survives recomputation, and multi-branch people resolve to more than one label. |
-| XH-005 | TODO | P1 | Surface address terms in the workspace | Graph nodes and the side panel show the term for the current reference person, multi-branch nodes show both, and unknown seniority is visibly flagged. |
-| XH-006 | TODO | P1 | Ship the relative list and invitation output | Sortable exportable table of every relative with term, self-reference, branch, and unknown-seniority flag, plus the formal register composed for printed invitations. |
+| XH-005 | TODO | P0 | Surface address terms in the workspace | Graph nodes and the side panel show the term for the current reference person, multi-branch nodes show both, and unknown seniority is visibly flagged. |
+| XH-006 | TODO | P0 | Ship the relative list and invitation output | Sortable exportable table of every relative with term, self-reference, branch, and unknown-seniority flag, plus the formal register composed for printed invitations. |
+| XH-007 | TODO | P0 | Join the kinship engine to branch profiles | Given ego and a target, the join loads the target's branch profiles and returns one address resolution per branch, reusing the persons and relationships already held in the store rather than re-querying. |
+| XH-008 | TODO | P0 | Build the branch setup interface | A user can name a branch, choose its region, pick root people, and manually assign anyone derivation misses, without leaving the app. |
 
 ## Definition of done
 

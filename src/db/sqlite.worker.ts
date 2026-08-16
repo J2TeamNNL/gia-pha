@@ -7,6 +7,7 @@ import {
   type TreeMetadata,
 } from "./catalog";
 import type {
+  BatchStatement,
   QueryResult,
   SqlValue,
   WorkerRequest,
@@ -67,6 +68,17 @@ function rows(db: SqliteDatabase, sql: string, params?: SqlValue[]): QueryResult
 
 function run(db: SqliteDatabase, sql: string, params?: SqlValue[]): void {
   db.exec({ sql, bind: params });
+}
+
+function batch(db: SqliteDatabase, statements: readonly BatchStatement[]): void {
+  run(db, "BEGIN IMMEDIATE");
+  try {
+    for (const statement of statements) run(db, statement.sql, statement.params);
+    run(db, "COMMIT");
+  } catch (error) {
+    run(db, "ROLLBACK");
+    throw error;
+  }
 }
 
 function migrateTreeDatabase(db: SqliteDatabase): void {
@@ -274,6 +286,9 @@ async function handle(request: WorkerRequest): Promise<WorkerResponse> {
       return { id: request.id, ok: true, result: rows(currentTree(), request.sql, request.params) };
     case "run":
       run(currentTree(), request.sql, request.params);
+      return { id: request.id, ok: true };
+    case "batch":
+      batch(currentTree(), request.statements);
       return { id: request.id, ok: true };
     case "close":
       treeDatabase?.close();

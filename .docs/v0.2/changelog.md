@@ -4,6 +4,41 @@
 
 This log records both implementation and durable documentation changes. Dates use `YYYY-MM-DD`.
 
+## 2026-08-16 - Transactional bulk writes, and a backlog reordered around two deadlines
+
+**What**
+
+- `DB-001`: a `batch` worker command wrapping many statements in `BEGIN IMMEDIATE` /
+  `COMMIT` / `ROLLBACK`, exposed as `DatabaseClient.batch`, plus `src/db/bulk.ts` —
+  `bulkImport` mints ids, resolves caller-supplied `externalId` references (falling through
+  to an existing person id when the batch does not define one), validates every relationship
+  against stored *and* accumulated rows, and rejects the whole batch with the offending row
+  index. `createPerson` and `createRelationship` now share the statement builders.
+- Backlog reordered: `XH-005` / `XH-006` to P0, new `XH-007` (engine ↔ branch join) and
+  `XH-008` (branch setup UI), new `ENT-001` / `ENT-002` for fast entry, `IO-001` / `IO-002`
+  down to P2.
+- ADR-018 corrects the record on the graph stack; ADR-019 records the bulk write design.
+
+**Why**
+
+- The founder confirmed two dated outcomes — a wedding invitation list and addressing
+  relatives correctly at Tết — and a tree of 200–1000 people entered by hand or pasted from
+  a spreadsheet. GEDCOM and Native JSON serve neither, so they yield priority; a
+  one-row-at-a-time write path does not survive a 1000-row paste, so it comes first.
+- ADR-005 described React Flow plus ELK, which `UI-002` never used and `package.json` never
+  depended on. Documentation that misdescribes the stack misdirects every agent reading it.
+
+**Impact**
+
+- `DatabaseClient` gains a required `batch` method; the fake client in `branches.test.ts`
+  was updated. No existing call site changes behaviour.
+- `CLAUDE.md`, `context.md`, and `plan.md` no longer name React Flow or ELK.
+
+**References**
+
+- `src/db/{bulk.ts,bulk.test.ts,client.ts,protocol.ts,sqlite.worker.ts,persons.ts}`
+- ADR-018, ADR-019; `tasks.md` `DB-001`, `ENT-001`, `ENT-002`, `XH-007`, `XH-008`
+
 ## 2026-08-16 - Kinship engine, branch profiles, and GEDCOM import landed
 
 **What**

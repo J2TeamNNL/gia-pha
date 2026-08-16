@@ -33,8 +33,9 @@ change is finished.
 ## Architecture
 
 Vite + React + TypeScript + Tailwind. SQLite WASM in a dedicated Worker with OPFS
-persistence; one catalog database plus one isolated SQLite file per tree. React Flow for
-viewport interaction with ELK in a Worker for layout.
+persistence; one catalog database plus one isolated SQLite file per tree. The graph is a
+hand-written SVG/DOM canvas (`src/components/GraphView.tsx`) over a plain layout Worker
+(`src/graph/layout.worker.ts`) — there is no React Flow and no ELK dependency (ADR-018).
 
 ```
 src/

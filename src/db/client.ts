@@ -1,5 +1,6 @@
 import type { ActiveTreeMetadata, TreeMetadata } from "./catalog";
 import type {
+  BatchStatement,
   QueryResult,
   SqlValue,
   WorkerCommand,
@@ -7,11 +8,12 @@ import type {
   WorkerResponse,
 } from "./protocol";
 
-export type { QueryResult, SqlValue } from "./protocol";
+export type { BatchStatement, QueryResult, SqlValue } from "./protocol";
 
 export interface DatabaseClient {
   exec(sql: string, params?: SqlValue[]): Promise<QueryResult[]>;
   run(sql: string, params?: SqlValue[]): Promise<void>;
+  batch(statements: BatchStatement[]): Promise<void>;
   close(): Promise<void>;
   listTrees(): Promise<TreeMetadata[]>;
   createTree(name: string): Promise<TreeMetadata>;
@@ -112,6 +114,11 @@ class SqliteWorkerClient implements DatabaseClient {
 
   async run(sql: string, params?: SqlValue[]): Promise<void> {
     await this.request({ type: "run", sql, params });
+  }
+
+  async batch(statements: BatchStatement[]): Promise<void> {
+    if (!statements.length) return;
+    await this.request({ type: "batch", statements });
   }
 
   async close(): Promise<void> {

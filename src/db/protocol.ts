@@ -12,10 +12,16 @@ export interface QueryResult {
   values: SqlValue[][];
 }
 
+export interface BatchStatement {
+  sql: string;
+  params?: SqlValue[];
+}
+
 export type WorkerCommand =
   | { type: "initialize" }
   | { type: "exec"; sql: string; params?: SqlValue[] }
   | { type: "run"; sql: string; params?: SqlValue[] }
+  | { type: "batch"; statements: BatchStatement[] }
   | { type: "close" }
   | { type: "list-trees" }
   | { type: "create-tree"; name: string }
