@@ -39,6 +39,13 @@ export const REGION_PROFILES: Record<string, RegionProfile> = {
   [TRUNG_QUANG_TRI.code]: TRUNG_QUANG_TRI,
 };
 
+/** Province codes that have their own overrides within a region. */
+export function provinceVariants(region: string): string[] {
+  return Object.keys(REGION_PROFILES)
+    .filter((code) => code.startsWith(`${region}:`))
+    .map((code) => code.slice(region.length + 1));
+}
+
 function stripSeniorityMarkers(signature: string): string {
   return signature.replace(/[ey]/g, "");
 }

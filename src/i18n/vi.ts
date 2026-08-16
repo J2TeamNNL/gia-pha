@@ -95,6 +95,38 @@ export interface Dictionary {
     closePanel: string;
   };
   personCard: { deceased: string };
+  branch: {
+    open: string;
+    title: string;
+    description: string;
+    defaultRegion: string;
+    defaultRegionHint: string;
+    create: string;
+    namePlaceholder: string;
+    region: string;
+    province: string;
+    provincePlaceholder: string;
+    provinceHint: string;
+    hasDialect: string;
+    noDialect: string;
+    roots: string;
+    rootsHint: string;
+    manual: string;
+    manualHint: string;
+    addPerson: string;
+    searchPlaceholder: string;
+    noResults: string;
+    remove: string;
+    memberCount: string;
+    recompute: string;
+    recomputing: string;
+    deleteBranch: string;
+    deleteConfirm: string;
+    empty: string;
+    selectBranch: string;
+    close: string;
+    regions: { BAC: string; TRUNG: string; NAM: string };
+  };
   paste: {
     open: string;
     title: string;
@@ -247,6 +279,44 @@ export const vi: Dictionary = {
 
   personCard: {
     deceased: "Đã mất",
+  },
+
+  branch: {
+    open: "Nhánh",
+    title: "Nhánh và cách xưng hô",
+    description:
+      "Mỗi nhánh có vùng miền riêng. Cùng một cây có thể vừa có họ nội Quảng Trị, họ ngoại Hà Nội, vừa có bên vợ miền Nam — mỗi bên xưng hô theo giọng của mình.",
+    defaultRegion: "Vùng mặc định",
+    defaultRegionHint:
+      "Dùng cho người chưa thuộc nhánh nào. Đây là lựa chọn của bạn, không phải phỏng đoán.",
+    create: "Thêm nhánh",
+    namePlaceholder: "vd: Họ nội (Quảng Trị)",
+    region: "Vùng",
+    province: "Tỉnh / quê quán",
+    provincePlaceholder: "vd: Quảng Trị",
+    provinceHint:
+      "Gõ tên tỉnh cũ hay mới đều được. Hiện chỉ Quảng Trị có bộ từ riêng; tỉnh khác dùng từ chung của miền cho tới khi bạn tự sửa.",
+    roots: "Người gốc của nhánh",
+    rootsHint:
+      "Con cháu của những người này, và vợ/chồng của họ, tự động thuộc nhánh.",
+    manual: "Gán thêm thủ công",
+    manualHint:
+      "Dành cho người cần xưng hô đúng nhưng không chung tổ tiên. Gán tay không bị mất khi tính lại.",
+    addPerson: "Thêm người",
+    searchPlaceholder: "Tìm theo tên…",
+    noResults: "Không tìm thấy ai.",
+    remove: "Bỏ",
+    memberCount: "{count} người",
+    recompute: "Tính lại thành viên",
+    recomputing: "Đang tính…",
+    deleteBranch: "Xóa nhánh",
+    deleteConfirm: "Xóa nhánh này? Cách xưng hô của những người trong nhánh sẽ quay về vùng mặc định.",
+    empty: "Chưa có nhánh nào.",
+    selectBranch: "Chọn một nhánh để chỉnh sửa.",
+    close: "Đóng",
+    hasDialect: "Có bộ từ riêng",
+    noDialect: "Dùng từ chung của miền",
+    regions: { BAC: "Miền Bắc", TRUNG: "Miền Trung", NAM: "Miền Nam" },
   },
 
   paste: {

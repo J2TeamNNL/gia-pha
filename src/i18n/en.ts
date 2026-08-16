@@ -109,6 +109,44 @@ export const en: Dictionary = {
     deceased: "Deceased",
   },
 
+  branch: {
+    open: "Branches",
+    title: "Branches and how they address each other",
+    description:
+      "Each branch carries its own region. One tree can hold a Quảng Trị paternal line, a Hà Nội maternal line, and a southern spouse's family, each addressed in its own register.",
+    defaultRegion: "Default region",
+    defaultRegionHint:
+      "Used for anyone in no branch. This is your choice, not a guess.",
+    create: "Add a branch",
+    namePlaceholder: "e.g. Paternal line (Quảng Trị)",
+    region: "Region",
+    province: "Province / ancestral home",
+    provincePlaceholder: "e.g. Quảng Trị",
+    provinceHint:
+      "Type any province name, current or historical. Only Quảng Trị carries its own words today; anywhere else uses the region's shared words until you correct them.",
+    roots: "Root people",
+    rootsHint:
+      "Their descendants, and the partners who married in, belong to the branch automatically.",
+    manual: "Assigned by hand",
+    manualHint:
+      "For people who must be addressed correctly but share no ancestor. Manual assignments survive a recompute.",
+    addPerson: "Add a person",
+    searchPlaceholder: "Search by name…",
+    noResults: "Nobody found.",
+    remove: "Remove",
+    memberCount: "{count} people",
+    recompute: "Recompute members",
+    recomputing: "Recomputing…",
+    deleteBranch: "Delete branch",
+    deleteConfirm: "Delete this branch? Its members fall back to the default region.",
+    empty: "No branches yet.",
+    selectBranch: "Select a branch to edit.",
+    close: "Close",
+    hasDialect: "Has its own words",
+    noDialect: "Uses the region's words",
+    regions: { BAC: "North", TRUNG: "Central", NAM: "South" },
+  },
+
   paste: {
     open: "Paste a list",
     title: "Paste a list from a spreadsheet",

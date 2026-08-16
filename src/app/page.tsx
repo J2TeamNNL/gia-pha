@@ -7,11 +7,13 @@ import { SidePanel } from "@/components/SidePanel";
 import { OnboardingScreen } from "@/components/OnboardingScreen";
 import { TreeCatalog } from "@/components/TreeCatalog";
 import { PasteImport } from "@/components/PasteImport";
+import { BranchSetup } from "@/components/BranchSetup";
 import { useTreeStore } from "@/store/treeStore";
 import { useTranslation } from "@/i18n/useTranslation";
 import {
   ClipboardPaste,
   FolderTree,
+  GitBranch,
   Globe,
   Plus,
   TreePine,
@@ -52,9 +54,10 @@ export default function Home() {
   const [catalogError, setCatalogError] = useState<string>();
   const [catalogVisible, setCatalogVisible] = useState(false);
   const [pasteVisible, setPasteVisible] = useState(false);
+  const [branchVisible, setBranchVisible] = useState(false);
   const showOnboarding = isOnboarding && persons.length === 0;
   const showsWorkspaceActions =
-    Boolean(activeTreeId) && !catalogVisible && !pasteVisible;
+    Boolean(activeTreeId) && !catalogVisible && !pasteVisible && !branchVisible;
 
   useEffect(() => {
     const error = getDatabaseRuntimeError()?.message;
@@ -166,7 +169,10 @@ export default function Home() {
           {activeTreeId && !catalogVisible && (
             <button
               type="button"
-              onClick={() => setPasteVisible((visible) => !visible)}
+              onClick={() => {
+                setBranchVisible(false);
+                setPasteVisible((visible) => !visible);
+              }}
               className="flex items-center gap-1.5 border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-sm px-3 py-2 rounded-full transition-colors"
               aria-pressed={pasteVisible}
               aria-label={t.paste.open}
@@ -175,10 +181,26 @@ export default function Home() {
               <span className="hidden sm:inline">{t.paste.open}</span>
             </button>
           )}
+          {activeTreeId && !catalogVisible && (
+            <button
+              type="button"
+              onClick={() => {
+                setPasteVisible(false);
+                setBranchVisible((visible) => !visible);
+              }}
+              className="flex items-center gap-1.5 border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-sm px-3 py-2 rounded-full transition-colors"
+              aria-pressed={branchVisible}
+              aria-label={t.branch.open}
+            >
+              <GitBranch className="size-4" />
+              <span className="hidden sm:inline">{t.branch.open}</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={() => {
               setPasteVisible(false);
+              setBranchVisible(false);
               setCatalogVisible((visible) => !visible);
             }}
             className="flex items-center gap-1.5 border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-sm px-3 py-2 rounded-full transition-colors"
@@ -268,6 +290,8 @@ export default function Home() {
           />
         ) : pasteVisible ? (
           <PasteImport onClose={() => setPasteVisible(false)} />
+        ) : branchVisible ? (
+          <BranchSetup onClose={() => setBranchVisible(false)} />
         ) : showOnboarding ? (
           <OnboardingScreen />
         ) : (

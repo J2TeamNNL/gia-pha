@@ -4,6 +4,38 @@
 
 This log records both implementation and durable documentation changes. Dates use `YYYY-MM-DD`.
 
+## 2026-08-16 - Branch setup, reachable from the app at last
+
+**What**
+
+- `XH-008`: `src/components/BranchSetup.tsx` — create, rename, and delete a branch; pick its
+  region and province; add root people and hand-assigned members through a shared
+  `PersonPicker`; recompute derived membership; and set the default region.
+- `src/lib/province.ts` normalizes a typed province name to the code a dialect variant is
+  keyed by, so "Quảng Trị", "quang tri", and "QUẢNG TRỊ" all reach the same dictionary.
+- The editor states plainly whether the chosen province has its own words or falls back to
+  the region's shared ones.
+
+**Why**
+
+- `XH-004` shipped a repository with no interface; without this screen no branch can exist,
+  so nothing downstream can render a regional term at all.
+- Province is a free-text field rather than a dropdown. Vietnam's provinces were merged in
+  2025 and a family record's quê quán is routinely written with the older name, so a curated
+  list would be both stale and wrong for the actual use. Typing any name works; only the
+  names with authored dialect data change the words, and the UI says which is which.
+
+**Impact**
+
+- Only `QUANG_TRI` currently has authored overrides. Every other province inherits its
+  region's words, and the editor labels that rather than implying a dialect exists.
+- 101 tests across 16 files; lint, typecheck, and build pass.
+
+**References**
+
+- `src/components/{BranchSetup.tsx,PersonPicker.tsx}`, `src/lib/province.ts`
+- `src/app/page.tsx`, `tasks.md` `XH-008`
+
 ## 2026-08-16 - The kinship engine now knows which dialect to speak
 
 **What**

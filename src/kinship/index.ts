@@ -9,6 +9,7 @@ export {
   REGION_PROFILES,
   resolveAddress,
   birthOrderLabel,
+  provinceVariants,
   withProvince,
 } from "./dictionaries";
 export type {
