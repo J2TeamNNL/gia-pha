@@ -4,6 +4,33 @@
 
 This log records both implementation and durable documentation changes. Dates use `YYYY-MM-DD`.
 
+## 2026-08-17 - Documentation caught up with what shipped
+
+**What**
+
+- `flow.md`: the delivery-state diagram still listed `XH-005`, `XH-006`, `XH-008`, and the
+  branch join as "Not built" when all four had shipped. Replaced with the current state, and
+  a new diagram traces both entry paths — pasted list and quick form — through `bulkImport`
+  into one transaction.
+- `flow.md` "Data entry" now describes the single full-name field, birth and death year, and
+  siblings linking through shared parents.
+- `README.md`: "None of it is reachable from the UI yet" was flatly false. Replaced with the
+  verified state, the P2 deferrals, and the three items genuinely still open.
+
+**Why**
+
+- These two files are what the next session reads first. Left as they were, they would have
+  sent an agent to rebuild features that already exist and to treat a shipped feature as
+  blocked.
+
+**Impact**
+
+- No code changed. `tasks.md`, `decisions.md`, and `context.md` were already current.
+
+**References**
+
+- `.docs/v0.2/{flow.md,README.md}`
+
 ## 2026-08-17 - What driving the real app exposed
 
 Found by running the built app in a browser and reading the screenshots, not by

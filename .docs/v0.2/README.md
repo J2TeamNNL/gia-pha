@@ -1,4 +1,4 @@
-<!-- snapshot: v0.2 | current | updated: 2026-08-16 -->
+<!-- snapshot: v0.2 | current | updated: 2026-08-17 -->
 
 # Gia Phả — v0.2
 
@@ -14,7 +14,7 @@ Current source of truth. Adds the xưng hô specification to the v0.1 baseline.
 | `decisions.md` | ADR-001 … ADR-013 |
 | `tasks.md` | Executable backlog with acceptance criteria |
 | `flow.md` | UX workflows, data flows, and diagrams for tree lifecycle, xưng hô resolution, branch profiles |
-| `changelog.md` | History through 2026-08-16 |
+| `changelog.md` | History through 2026-08-17 |
 
 ## What changed from v0.1
 
@@ -26,18 +26,27 @@ The new part is regional: a branch profile carries a region and language, so one
 render a Quảng Trị paternal line, a Hà Nội maternal line, and a southern spouse's family in
 their own registers at once. No competitor analysed in `reference/` does this.
 
-## Where the work stands (2026-08-16)
+## Where the work stands (2026-08-17)
 
-Landed and green — `npm run lint`, `npm run typecheck`, `npm test` all pass, 69 tests:
+Green across the whole CI order — lint, typecheck, 125 unit tests, production build, and 7
+Playwright specs driving a real browser.
 
-- `XH-001`…`XH-003` — `src/kinship/`, the address resolver and regional dictionaries
-- `XH-004` — `src/db/`, migration v4 and branch membership
-- `IO-002` import half — `src/io/gedcom/`
+The xưng hô feature is **reachable and proven end to end**: paste a family, mark a reference
+person, and every card carries the term that person uses, in that relative's branch dialect.
+A Quảng Trị branch renders `mệ`, `o`, `bọ`, `mạ` where a northern branch renders `bà`, `bác`,
+`bố`, `mẹ`.
 
-**None of it is reachable from the UI yet.** The engine is pure and takes plain arrays; the
-GEDCOM importer returns data without writing to the database. Start the next session at
-`plan.md`, "Current plan — xưng hô delivery"; Phase A joins the branch layer to the engine
-and everything else depends on it.
+- `XH-001`…`XH-004` engine and branch membership, joined by `XH-007`
+- `XH-005` terms on the graph and side panel, `XH-006` relative list and invitation output,
+  `XH-008` branch setup
+- `DB-001` transactional bulk writes; `ENT-001`…`ENT-004` the two entry paths
+
+Deferred to P2 by the founder on 2026-08-16: `IO-001` Native JSON and `IO-002` GEDCOM
+export. Neither serves entering a tree by hand or printing an invitation list, and the
+GEDCOM import half stays landed but unwired.
+
+Still open and genuinely P0/P1: `PRIV-001` (a test proving no family data reaches the
+network), `PERF-001` (10,000 people), `REL-001` (visible version and build SHA).
 
 ## Verified state of the codebase
 
