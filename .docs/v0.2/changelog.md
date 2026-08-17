@@ -4,6 +4,49 @@
 
 This log records both implementation and durable documentation changes. Dates use `YYYY-MM-DD`.
 
+## 2026-08-17 - What driving the real app exposed
+
+Found by running the built app in a browser and reading the screenshots, not by
+reading the code.
+
+**What**
+
+- `ENT-004`: the quick add form had **no birth year field at all**, so every person entered
+  through it resolved to `chưa rõ` for `bác` / `chú` / `o` / `dì`. Birth year, death year,
+  and an "đã mất" toggle are now on the form itself.
+- Three name inputs collapsed into one `Họ tên` field that splits surname-first and shows
+  the split, with an "edit the split" escape hatch for names the rule gets wrong.
+- After saving, the surname is kept in the box so a run of siblings needs only the given
+  name typed; `Lưu và thêm tiếp` is now the primary button and states its shortcut.
+- The header overflowed a 390px viewport by 219px, pushing the whole page sideways and
+  leaving the graph blank beside the panel. The toolbar now scrolls, the primary action is
+  pinned outside the scroll area, and the language switcher hides below `md`.
+- The reference person now carries a `Bản thân` badge on their card.
+- The paste screen offers a worked example to insert.
+
+**Why**
+
+- Every one of these was invisible from the code and obvious from a screenshot. The birth
+  year gap in particular defeated the feature the whole session was built around: seniority
+  cannot be resolved without it, and the form silently produced people it could never
+  resolve.
+
+**Impact**
+
+- 7 e2e specs; the new one enters a younger brother of the father through the form and
+  asserts he reads `chú` while the elder brother from the pasted list stays `bác` — proof
+  the birth-year path works end to end.
+- `QuickAddForm`'s placeholder and save-button labels changed, so two `home.spec.ts`
+  selectors were updated.
+- A `key` was added to the add-buttons `AnimatePresence` child. The stray buttons seen
+  during testing were the exit animation, not a stuck node; the key is correctness hygiene,
+  not the fix, and the test now waits for the state instead of racing the fade.
+
+**References**
+
+- `src/components/{QuickAddForm.tsx,PersonCard.tsx,PasteImport.tsx,GraphView.tsx}`
+- `src/app/page.tsx`, `e2e/xung-ho.spec.ts`, `tasks.md` `ENT-004`
+
 ## 2026-08-16 - Browser proof for the whole xưng hô flow, and a CSV export that cannot run
 
 **What**

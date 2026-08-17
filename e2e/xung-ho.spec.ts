@@ -39,6 +39,9 @@ async function makeLongTheReferencePerson(
   await page.getByRole("button", { name: "Đặt làm trung tâm" }).click();
   await expect(page.getByText("⭐ Bản thân")).toBeVisible();
   await page.keyboard.press("Escape");
+  // The deselected card fades its add-buttons out; wait for them to go rather
+  // than racing the animation.
+  await expect(page.locator('[title="Thêm con"]')).toHaveCount(0);
 }
 
 test("pastes a family, then names the father's elder brother bác", async ({
@@ -104,4 +107,28 @@ test("creates a branch and shows it in the graph legend", async ({ page }) => {
   await expect(
     page.getByRole("listitem").filter({ hasText: "Họ nội" }),
   ).toBeVisible();
+});
+
+test("a birth year typed into the form decides bác versus chú", async ({
+  page,
+}) => {
+  await createTreeWithPastedFamily(page, "Cây Vai Vế");
+  await makeLongTheReferencePerson(page);
+  await page.getByLabel("Số thế hệ hiển thị").selectOption({ label: "Tất cả" });
+
+  // A brother of the father, born after him, is chú rather than bác.
+  await page.getByRole("button", { name: /Nguyễn Văn Bố/ }).click();
+  await page.getByTitle("Thêm anh chị em").click();
+  await page.getByLabel("Họ tên").fill("Nguyễn Văn Út");
+  await page.getByLabel("Năm sinh").fill("1970");
+  await page.getByRole("button", { name: "Lưu và đóng" }).click();
+
+  const youngerUncle = page.getByRole("button", { name: /Nguyễn Văn Út/ });
+  await expect(youngerUncle).toBeVisible();
+  await expect(youngerUncle).toContainText("chú");
+
+  // The elder brother from the pasted list stays bác, so the split is real.
+  await expect(page.getByRole("button", { name: /Nguyễn Văn Cả/ })).toContainText(
+    "bác",
+  );
 });

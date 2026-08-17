@@ -48,6 +48,17 @@ export interface Dictionary {
     phonePlaceholder: string;
     notePlaceholder: string;
     unknownGender: string;
+    fullName: string;
+    fullNamePlaceholder: string;
+    splitAs: string;
+    editSplit: string;
+    hideSplit: string;
+    birthYear: string;
+    birthYearPlaceholder: string;
+    deceased: string;
+    deathYear: string;
+    saveAndClose: string;
+    shortcutHint: string;
     saveAndNext: string;
     savedNotice: string;
     relationLabel: string;
@@ -174,6 +185,8 @@ export interface Dictionary {
     description: string;
     formatHint: string;
     placeholder: string;
+    insertSample: string;
+    clear: string;
     headerDetected: string;
     headerAssumed: string;
     preview: string;
@@ -263,6 +276,17 @@ export const vi: Dictionary = {
     phonePlaceholder: "912 345 678",
     notePlaceholder: "Thêm ghi chú...",
     unknownGender: "Chưa rõ",
+    fullName: "Họ tên",
+    fullNamePlaceholder: "vd: Nguyễn Văn An",
+    splitAs: "Tách thành",
+    editSplit: "Sửa cách tách tên",
+    hideSplit: "Ẩn",
+    birthYear: "Năm sinh",
+    birthYearPlaceholder: "vd: 1950",
+    deceased: "Đã mất",
+    deathYear: "Năm mất",
+    saveAndClose: "Lưu và đóng",
+    shortcutHint: "Ctrl + Enter để lưu và nhập người tiếp theo",
     saveAndNext: "Lưu và thêm tiếp",
     savedNotice: "Đã lưu {name}.",
     relationLabel: "Quan hệ với {name}",
@@ -413,6 +437,8 @@ export const vi: Dictionary = {
     formatHint:
       "Cột: Họ tên, Giới tính, Năm sinh, Cha, Mẹ, Vợ/Chồng. Cha/Mẹ/Vợ/Chồng ghi đúng họ tên của người trong danh sách hoặc đã có trong cây. Trùng tên thì ghi thêm năm sinh trong ngoặc: Nguyễn Văn An (1950).",
     placeholder: "Dán vào đây…",
+    insertSample: "Chèn ví dụ mẫu",
+    clear: "Xóa hết",
     headerDetected: "Đã nhận ra dòng tiêu đề.",
     headerAssumed:
       "Không thấy dòng tiêu đề — đọc theo thứ tự: Họ tên, Giới tính, Năm sinh, Cha, Mẹ, Vợ/Chồng.",

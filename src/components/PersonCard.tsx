@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import type { Person } from "@/db/types";
 import { cn } from "@/lib/utils";
-import { Plus } from "lucide-react";
+import { Plus, Star } from "lucide-react";
 
 interface PersonCardProps {
   person: Person;
@@ -19,6 +19,9 @@ interface PersonCardProps {
   unknownLabel?: string;
   /** Accent of the branch this person belongs to, for telling sides apart. */
   branchColor?: string | null;
+  /** The person every address term is measured from. */
+  isAnchor?: boolean;
+  anchorLabel?: string;
 }
 
 function getInitials(person: Person) {
@@ -46,6 +49,8 @@ export function PersonCard({
   kinshipMultiBranch,
   unknownLabel,
   branchColor,
+  isAnchor,
+  anchorLabel,
 }: PersonCardProps) {
   const isMale = person.gender === "MALE";
   const avatarBg = isMale
@@ -120,6 +125,12 @@ export function PersonCard({
 
         {/* Name and Details */}
         <div className="w-full text-center space-y-0.5">
+          {isAnchor && (
+            <p className="mx-auto mb-1 flex w-fit items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold text-amber-800">
+              <Star className="size-3 fill-amber-500 text-amber-500" />
+              {anchorLabel}
+            </p>
+          )}
           {(kinshipCall || kinshipUnknown) && (
             <p
               className={cn(
@@ -159,6 +170,7 @@ export function PersonCard({
       <AnimatePresence>
         {isSelected && (
           <motion.div
+            key={`add-${person.id}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

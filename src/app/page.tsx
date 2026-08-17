@@ -90,7 +90,9 @@ export default function Home() {
     void refreshCatalog()
       .catch((error: unknown) => {
         if (!cancelled) {
-          setCatalogError(error instanceof Error ? error.message : String(error));
+          setCatalogError(
+            error instanceof Error ? error.message : String(error),
+          );
         }
       })
       .finally(() => {
@@ -161,112 +163,114 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col bg-stone-50 text-stone-900">
       <header className="h-14 px-5 border-b border-stone-200 bg-white flex items-center justify-between sticky top-0 z-50 shadow-sm">
-        <div className="flex items-center gap-2">
-          <TreePine className="size-5 text-stone-700" />
-          <span className="font-bold font-serif text-lg text-stone-800 tracking-tight">
+        <div className="flex shrink-0 items-center gap-2">
+          <TreePine className="size-5 shrink-0 text-stone-700" />
+          <span className="whitespace-nowrap font-bold font-serif text-lg text-stone-800 tracking-tight">
             {t.appName}
           </span>
-          <span className="hidden sm:inline-block text-xs px-2 py-0.5 bg-stone-100 text-stone-500 rounded-full border border-stone-200 font-medium">
+          <span className="hidden xl:inline-block text-xs px-2 py-0.5 bg-stone-100 text-stone-500 rounded-full border border-stone-200 font-medium whitespace-nowrap">
             {t.appTagline}
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
-          {showsWorkspaceActions && !showOnboarding && <SearchBox />}
-          {activeTreeId && !catalogVisible && (
-            <button
-              type="button"
-              onClick={() => {
-                setBranchVisible(false);
-                setRelativesVisible(false);
-                setPasteVisible((visible) => !visible);
-              }}
-              className="flex items-center gap-1.5 border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-sm px-3 py-2 rounded-full transition-colors"
-              aria-pressed={pasteVisible}
-              aria-label={t.paste.open}
-            >
-              <ClipboardPaste className="size-4" />
-              <span className="hidden sm:inline">{t.paste.open}</span>
-            </button>
-          )}
-          {activeTreeId && !catalogVisible && (
-            <button
-              type="button"
-              onClick={() => {
-                setPasteVisible(false);
-                setRelativesVisible(false);
-                setBranchVisible((visible) => !visible);
-              }}
-              className="flex items-center gap-1.5 border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-sm px-3 py-2 rounded-full transition-colors"
-              aria-pressed={branchVisible}
-              aria-label={t.branch.open}
-            >
-              <GitBranch className="size-4" />
-              <span className="hidden sm:inline">{t.branch.open}</span>
-            </button>
-          )}
-          {activeTreeId && !catalogVisible && (
-            <button
-              type="button"
-              onClick={() => {
-                setPasteVisible(false);
-                setBranchVisible(false);
-                setRelativesVisible((visible) => !visible);
-              }}
-              className="flex items-center gap-1.5 border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-sm px-3 py-2 rounded-full transition-colors"
-              aria-pressed={relativesVisible}
-              aria-label={t.relatives.open}
-            >
-              <Users className="size-4" />
-              <span className="hidden sm:inline">{t.relatives.open}</span>
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={() => {
-              setPasteVisible(false);
-              setBranchVisible(false);
-              setRelativesVisible(false);
-              setCatalogVisible((visible) => !visible);
-            }}
-            className="flex items-center gap-1.5 border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-sm px-3 py-2 rounded-full transition-colors"
-            aria-pressed={catalogVisible}
-            aria-label={t.header.treeCatalog}
-          >
-            <FolderTree className="size-4" />
-            <span className="hidden sm:inline">Cây</span>
-          </button>
-          {/* Language switcher */}
-          <div className="flex items-center gap-1 border border-stone-200 rounded-full px-1 py-1 bg-white">
-            <Globe className="size-3.5 text-stone-400 ml-1.5" />
-            {LOCALES.map(({ code, label }) => (
+        <div className="flex min-w-0 flex-1 items-center justify-end gap-2">
+          <div className="flex min-w-0 items-center gap-2 overflow-x-auto">
+            {showsWorkspaceActions && !showOnboarding && <SearchBox />}
+            {activeTreeId && !catalogVisible && (
               <button
-                key={code}
-                onClick={() => setLocale(code)}
-                className={`text-xs px-2.5 py-1 rounded-full font-medium transition-colors ${
-                  locale === code
-                    ? "bg-stone-800 text-white"
-                    : "text-stone-500 hover:text-stone-700"
-                }`}
+                type="button"
+                onClick={() => {
+                  setBranchVisible(false);
+                  setRelativesVisible(false);
+                  setPasteVisible((visible) => !visible);
+                }}
+                className="flex shrink-0 items-center gap-1.5 whitespace-nowrap border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-sm px-3 py-2 rounded-full transition-colors"
+                aria-pressed={pasteVisible}
+                aria-label={t.paste.open}
               >
-                {label}
+                <ClipboardPaste className="size-4" />
+                <span className="hidden lg:inline">{t.paste.open}</span>
               </button>
-            ))}
+            )}
+            {activeTreeId && !catalogVisible && (
+              <button
+                type="button"
+                onClick={() => {
+                  setPasteVisible(false);
+                  setRelativesVisible(false);
+                  setBranchVisible((visible) => !visible);
+                }}
+                className="flex shrink-0 items-center gap-1.5 whitespace-nowrap border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-sm px-3 py-2 rounded-full transition-colors"
+                aria-pressed={branchVisible}
+                aria-label={t.branch.open}
+              >
+                <GitBranch className="size-4" />
+                <span className="hidden lg:inline">{t.branch.open}</span>
+              </button>
+            )}
+            {activeTreeId && !catalogVisible && (
+              <button
+                type="button"
+                onClick={() => {
+                  setPasteVisible(false);
+                  setBranchVisible(false);
+                  setRelativesVisible((visible) => !visible);
+                }}
+                className="flex shrink-0 items-center gap-1.5 whitespace-nowrap border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-sm px-3 py-2 rounded-full transition-colors"
+                aria-pressed={relativesVisible}
+                aria-label={t.relatives.open}
+              >
+                <Users className="size-4" />
+                <span className="hidden lg:inline">{t.relatives.open}</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                setPasteVisible(false);
+                setBranchVisible(false);
+                setRelativesVisible(false);
+                setCatalogVisible((visible) => !visible);
+              }}
+              className="flex shrink-0 items-center gap-1.5 whitespace-nowrap border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-sm px-3 py-2 rounded-full transition-colors"
+              aria-pressed={catalogVisible}
+              aria-label={t.header.treeCatalog}
+            >
+              <FolderTree className="size-4" />
+              <span className="hidden lg:inline">Cây</span>
+            </button>
+            {/* Language switcher */}
+            <div className="hidden md:flex shrink-0 items-center gap-1 border border-stone-200 rounded-full px-1 py-1 bg-white">
+              <Globe className="size-3.5 text-stone-400 ml-1.5" />
+              {LOCALES.map(({ code, label }) => (
+                <button
+                  key={code}
+                  onClick={() => setLocale(code)}
+                  className={`text-xs px-2.5 py-1 rounded-full font-medium transition-colors ${
+                    locale === code
+                      ? "bg-stone-800 text-white"
+                      : "text-stone-500 hover:text-stone-700"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {showsWorkspaceActions && !showOnboarding && (
             <button
               onClick={() => openForm("quick")}
-              className="flex items-center gap-1.5 bg-stone-800 hover:bg-stone-700 text-white text-sm font-medium px-4 py-2 rounded-full transition-colors shadow-sm"
+              className="flex shrink-0 items-center gap-1.5 whitespace-nowrap bg-stone-800 hover:bg-stone-700 text-white text-sm font-medium px-4 py-2 rounded-full transition-colors shadow-sm"
             >
               <Plus className="size-4" />
-              <span className="hidden sm:inline">{t.header.addMember}</span>
+              <span className="hidden lg:inline">{t.header.addMember}</span>
             </button>
           )}
         </div>
       </header>
 
-      <main className="flex-1 flex overflow-hidden">
+      <main className="relative flex-1 flex overflow-hidden">
         {databaseRuntimeError && (
           <div
             role="alert"

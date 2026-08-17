@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { useTreeStore } from "@/store/treeStore";
 import { bulkImport, linksForRelation, type RelationKind } from "@/db/bulk";
 import type { Gender } from "@/db/types";
-import { displayName } from "@/lib/personName";
+import { displayName, splitFullName } from "@/lib/personName";
 import { useTranslation } from "@/i18n/useTranslation";
 import { cn } from "@/lib/utils";
 import { PhoneInput } from "./PhoneInput";
@@ -41,9 +41,15 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
     (person) => person.id === relationTargetId,
   );
 
-  const [lastName, setLastName] = useState("");
-  const [middleName, setMiddleName] = useState("");
-  const [firstName, setFirstName] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [splitOverride, setSplitOverride] = useState<{
+    last: string;
+    middle: string;
+    first: string;
+  } | null>(null);
+  const [birthYear, setBirthYear] = useState("");
+  const [deathYear, setDeathYear] = useState("");
+  const [deceased, setDeceased] = useState(false);
   const [gender, setGender] = useState<Gender>("MALE");
   const [phoneLocal, setPhoneLocal] = useState("");
   const [note, setNote] = useState("");
@@ -54,9 +60,22 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [savedNotice, setSavedNotice] = useState<string | null>(null);
-  const givenNameRef = useRef<HTMLInputElement>(null);
+  const fullNameRef = useRef<HTMLInputElement>(null);
 
   const hasSavedPhone = frequentlyUsedFields.includes("phone_number");
+
+  const autoSplit = useMemo(() => splitFullName(fullName), [fullName]);
+  const nameParts = splitOverride
+    ? {
+        first_name: splitOverride.first.trim(),
+        middle_name: splitOverride.middle.trim() || undefined,
+        last_name: splitOverride.last.trim() || undefined,
+      }
+    : autoSplit;
+  const parsedYear = (value: string) => {
+    const year = Number.parseInt(value, 10);
+    return Number.isFinite(year) && year > 0 && year < 10000 ? year : undefined;
+  };
 
   const surnameSuggestions = useMemo(() => {
     const anchor = persons.find((person) => person.id === anchorPersonId);
@@ -90,7 +109,7 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
     template.replace("{name}", name);
 
   const save = async (keepOpen: boolean) => {
-    if (!firstName.trim()) {
+    if (!nameParts.first_name) {
       setError(t.form.errors.nameRequired);
       return;
     }
@@ -115,11 +134,11 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
         persons: [
           {
             externalId: NEW_PERSON,
-            first_name: firstName.trim(),
-            last_name: lastName.trim() || undefined,
-            middle_name: middleName.trim() || undefined,
+            ...nameParts,
             gender,
-            is_living: true,
+            is_living: !deceased,
+            birth_year: parsedYear(birthYear),
+            death_year: deceased ? parsedYear(deathYear) : undefined,
             phone_number: phoneNumber,
             notes: note.trim() || undefined,
           },
@@ -139,11 +158,15 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
         return;
       }
       setSavedNotice(fill(t.form.savedNotice, displayName(result.persons[0])));
-      setMiddleName("");
-      setFirstName("");
+      // Keep the surname so a run of siblings only needs the given name typed.
+      setFullName(nameParts.last_name ? `${nameParts.last_name} ` : "");
+      setSplitOverride(null);
+      setBirthYear("");
+      setDeathYear("");
+      setDeceased(false);
       setPhoneLocal("");
       setNote("");
-      givenNameRef.current?.focus();
+      fullNameRef.current?.focus();
     } catch (cause) {
       setError(
         cause instanceof Error ? cause.message : t.form.errors.genericError,
@@ -241,8 +264,9 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
 
       <div className="space-y-3">
         <div className="space-y-1.5">
-          <Label htmlFor="qa-last">
-            {t.form.lastName}
+          <Label htmlFor="qa-name">
+            {t.form.fullName}{" "}
+            <span className="text-red-500">{t.form.required}</span>
             {surnameSuggestions.length > 0 && (
               <span className="ml-2 text-xs font-normal text-stone-400">
                 ({t.form.surnameSuggestion}{" "}
@@ -251,61 +275,133 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
             )}
           </Label>
           <Input
-            id="qa-last"
-            name="family-name"
-            autoComplete="family-name"
-            list={
-              surnameSuggestions.length > 0 ? "surname-suggestions" : undefined
-            }
-            placeholder={t.form.lastNamePlaceholder}
-            value={lastName}
-            onChange={(event) => setLastName(event.target.value)}
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="qa-middle">
-            {t.form.middleName}{" "}
-            <span className="text-stone-400 text-xs font-normal">
-              {t.form.optional}
-            </span>
-          </Label>
-          <Input
-            id="qa-middle"
-            name="additional-name"
-            autoComplete="additional-name"
-            placeholder={t.form.middleNamePlaceholder}
-            value={middleName}
-            onChange={(event) => setMiddleName(event.target.value)}
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="qa-first">
-            {t.form.firstName}{" "}
-            <span className="text-red-500">{t.form.required}</span>
-          </Label>
-          <Input
-            id="qa-first"
-            ref={givenNameRef}
-            name="given-name"
-            autoComplete="given-name"
-            placeholder={t.form.firstNamePlaceholder}
-            value={firstName}
-            onChange={(event) => setFirstName(event.target.value)}
+            id="qa-name"
+            ref={fullNameRef}
+            name="name"
+            autoComplete="name"
+            placeholder={t.form.fullNamePlaceholder}
+            value={fullName}
+            onChange={(event) => {
+              setFullName(event.target.value);
+              setSplitOverride(null);
+            }}
             autoFocus
           />
+          {fullName.trim() && !splitOverride && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="pl-1 text-xs text-stone-400"
+            >
+              {t.form.splitAs}{" "}
+              <strong className="text-stone-600">
+                {[
+                  autoSplit.last_name,
+                  autoSplit.middle_name,
+                  autoSplit.first_name,
+                ]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </strong>{" "}
+              <button
+                type="button"
+                onClick={() =>
+                  setSplitOverride({
+                    last: autoSplit.last_name ?? "",
+                    middle: autoSplit.middle_name ?? "",
+                    first: autoSplit.first_name,
+                  })
+                }
+                className="underline underline-offset-2 hover:text-stone-600"
+              >
+                {t.form.editSplit}
+              </button>
+            </motion.p>
+          )}
         </div>
-        {(lastName || firstName) && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-xs text-stone-400 pl-1"
-          >
-            {t.form.displayName}{" "}
-            <strong className="text-stone-600">
-              {[lastName, middleName, firstName].filter(Boolean).join(" ")}
-            </strong>
-          </motion.p>
+
+        {splitOverride && (
+          <div className="grid grid-cols-3 gap-2">
+            <div className="space-y-1">
+              <Label htmlFor="qa-last" className="text-xs">
+                {t.form.lastName}
+              </Label>
+              <Input
+                id="qa-last"
+                value={splitOverride.last}
+                onChange={(event) =>
+                  setSplitOverride({ ...splitOverride, last: event.target.value })
+                }
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="qa-middle" className="text-xs">
+                {t.form.middleName}
+              </Label>
+              <Input
+                id="qa-middle"
+                value={splitOverride.middle}
+                onChange={(event) =>
+                  setSplitOverride({
+                    ...splitOverride,
+                    middle: event.target.value,
+                  })
+                }
+              />
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="qa-first" className="text-xs">
+                {t.form.firstName}
+              </Label>
+              <Input
+                id="qa-first"
+                value={splitOverride.first}
+                onChange={(event) =>
+                  setSplitOverride({
+                    ...splitOverride,
+                    first: event.target.value,
+                  })
+                }
+              />
+            </div>
+          </div>
         )}
+
+        <div className="grid grid-cols-2 gap-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="qa-birth">{t.form.birthYear}</Label>
+            <Input
+              id="qa-birth"
+              type="number"
+              inputMode="numeric"
+              placeholder={t.form.birthYearPlaceholder}
+              value={birthYear}
+              onChange={(event) => setBirthYear(event.target.value)}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="qa-death" className={cn(!deceased && "text-stone-400")}>
+              {t.form.deathYear}
+            </Label>
+            <Input
+              id="qa-death"
+              type="number"
+              inputMode="numeric"
+              disabled={!deceased}
+              value={deathYear}
+              onChange={(event) => setDeathYear(event.target.value)}
+            />
+          </div>
+        </div>
+        <label className="flex items-center gap-2 text-sm text-stone-600">
+          <input
+            type="checkbox"
+            checked={deceased}
+            onChange={(event) => setDeceased(event.target.checked)}
+            className="size-4 rounded border-stone-300"
+          />
+          {t.form.deceased}
+        </label>
       </div>
 
       <div className="space-y-1.5">
@@ -408,8 +504,7 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
           type="button"
           onClick={() => void save(true)}
           disabled={isLoading}
-          variant="outline"
-          className="w-full"
+          className="w-full bg-stone-800 hover:bg-stone-700 text-white"
         >
           {isLoading ? (
             <Loader2 className="size-4 animate-spin" />
@@ -417,6 +512,9 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
             t.form.saveAndNext
           )}
         </Button>
+        <p className="text-center text-[11px] text-stone-400">
+          {t.form.shortcutHint}
+        </p>
         <div className="flex gap-2">
           <Button
             type="button"
@@ -428,13 +526,14 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
           </Button>
           <Button
             type="submit"
+            variant="outline"
             disabled={isLoading}
-            className="flex-1 bg-stone-800 hover:bg-stone-700 text-white"
+            className="flex-1"
           >
             {isLoading ? (
               <Loader2 className="size-4 animate-spin" />
             ) : (
-              t.form.save
+              t.form.saveAndClose
             )}
           </Button>
         </div>

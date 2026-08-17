@@ -13,6 +13,14 @@ type PasteImportProps = { onClose: () => void };
 
 const PREVIEW_LIMIT = 200;
 
+/** A worked example, so the format is shown rather than only described. */
+const SAMPLE = [
+  "Họ tên\tGiới tính\tNăm sinh\tCha\tMẹ\tVợ/Chồng",
+  "Nguyễn Văn Tổ\tNam\t1930\t\t\tTrần Thị Cố",
+  "Trần Thị Cố\tNữ\t1933",
+  "Nguyễn Văn Bố\tNam\t1962\tNguyễn Văn Tổ\tTrần Thị Cố",
+].join("\n");
+
 function fill(template: string, values: Record<string, number | string>): string {
   return template.replace(/\{(\w+)\}/g, (match, key: string) =>
     key in values ? String(values[key]) : match,
@@ -89,6 +97,24 @@ export function PasteImport({ onClose }: PasteImportProps) {
         <p className="rounded-xl border border-stone-200 bg-white p-4 text-sm text-stone-600">
           {t.paste.formatHint}
         </p>
+
+        <div className="flex flex-wrap gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              setText(SAMPLE);
+              setDone(undefined);
+            }}
+          >
+            {t.paste.insertSample}
+          </Button>
+          {text.trim() && (
+            <Button variant="ghost" size="sm" onClick={() => setText("")}>
+              {t.paste.clear}
+            </Button>
+          )}
+        </div>
 
         <textarea
           value={text}

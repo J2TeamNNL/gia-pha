@@ -366,6 +366,8 @@ export function GraphView() {
               }
               unknownLabel={t.kinship.unknown}
               branchColor={colorByPerson.get(node.person.id) ?? null}
+              isAnchor={node.person.id === anchorPersonId}
+              anchorLabel={t.profile.anchorBadge}
               onClick={() =>
                 selectPerson(
                   node.person.id === selectedPersonId ? null : node.person.id,
