@@ -1,3 +1,7 @@
+> **SUPERSEDED.** Phân tích đợt đầu (tháng 2/2026), giữ lại để tra lịch sử.
+> Kết luận mới hơn và có kiểm chứng nằm ở `plans/reports/fb-research/` và `plans/reports/web-recon-260821-2312-competitor-web-demos.md`.
+> Chỗ nào mâu thuẫn thì **bản mới thắng**.
+
 # Phân tích AncestorTree
 
 🔗 **Nguồn:** [Minh-Tam-Solution/AncestorTree](https://github.com/Minh-Tam-Solution/AncestorTree)

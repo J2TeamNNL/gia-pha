@@ -2,6 +2,14 @@
 
 Website quản lý gia phả với mục tiêu bảo mật tối đa, dễ dàng sử dụng và lưu trữ dữ liệu tại cá nhân người dùng.
 
+## Trạng thái hiện tại (2026-08-22)
+
+Dự án đang ở giai đoạn đầu. **Đã chạy được**: nhập người, vẽ cây cơ bản, thêm nhánh trực tiếp, i18n VI/EN, lưu vào IndexedDB của trình duyệt.
+
+**Chưa có** (dù nằm trong danh sách dự kiến bên dưới): PWA installable / service worker / offline · Google Drive sync (`src/lib/drive.ts` hiện là mock) · export/backup · pan/zoom/arrow-key trên canvas · xưng hô tự động · lịch âm & Can Chi.
+
+Tài liệu: [`docs/`](docs/) — bắt đầu từ [`docs/README.md`](docs/README.md). Lộ trình: [`plans/roadmap.md`](plans/roadmap.md).
+
 ## Tính năng chính (Dự kiến)
 
 - **Local-first & Cloud Sync**: Toàn bộ nội dung gia phả được lưu trực tiếp trên Google Drive lưu trữ cá nhân của người dùng, không phụ thuộc vào Database server.
@@ -20,7 +28,7 @@ Website quản lý gia phả với mục tiêu bảo mật tối đa, dễ dàng
 
 ## Tham khảo
 
-Phân tích rút kinh nghiệm từ các dự án mã nguồn mở:
+Phân tích rút kinh nghiệm từ các dự án mã nguồn mở. Đánh giá trực tiếp và chi tiết: [`docs/competitive-landscape.md`](docs/competitive-landscape.md).
 
 - [Gia-Pha-Dien-Tu](https://github.com/0xAstroAlpha/Gia-Pha-Dien-Tu)
 - [giapha-os](https://github.com/homielab/giapha-os)
