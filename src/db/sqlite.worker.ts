@@ -13,6 +13,7 @@ import type {
   WorkerRequest,
   WorkerResponse,
 } from "./protocol";
+import { looksLikeSqliteFile, readLegacySqliteBytes } from "./legacy-indexeddb";
 
 type SqliteDatabase = InstanceType<
   Awaited<ReturnType<typeof sqlite3InitModule>>["oo1"]["OpfsDb"]
@@ -22,6 +23,9 @@ type SqliteRuntime = Awaited<ReturnType<typeof sqlite3InitModule>>;
 const CATALOG_FILE = "/gia-pha.catalog.sqlite3";
 const LEGACY_TREE_FILE = "/gia-pha.sqlite3";
 const LEGACY_TREE_ID = "legacy-single-tree";
+/** Where the blob recovered from the sql.js build's IndexedDB store lands. */
+const IMPORTED_LEGACY_TREE_FILE = "/gia-pha.imported-from-indexeddb.sqlite3";
+const IMPORTED_LEGACY_TREE_ID = "legacy-indexeddb-import";
 const ACTIVE_TREE_KEY = "active_tree_id";
 const CATALOG_SCHEMA_SQL = `
   CREATE TABLE IF NOT EXISTS trees (
@@ -167,6 +171,72 @@ async function migrateLegacyTreeIfNeeded(): Promise<void> {
   storeActiveTreeId(LEGACY_TREE_ID);
 }
 
+/** Writes bytes to an OPFS file, replacing whatever was there. */
+async function writeOpfsFile(fileName: string, bytes: Uint8Array): Promise<void> {
+  const entry = await resolveOpfsEntry(fileName);
+  if (!entry) throw new Error(`Cannot resolve an OPFS path for ${fileName}.`);
+  const handle = await entry.directory.getFileHandle(entry.file, { create: true });
+  const access = await handle.createSyncAccessHandle();
+  try {
+    access.truncate(0);
+    access.write(bytes, { at: 0 });
+    access.flush();
+  } finally {
+    access.close();
+  }
+}
+
+/** True when the database at this OPFS path holds a readable persons table. */
+function importedTreeHasPeople(fileName: string): boolean {
+  const sqlite = currentSqlite();
+  const database = new sqlite.oo1.OpfsDb(fileName);
+  try {
+    // Reaching a row count at all proves the file opened and carries the table
+    // the rest of the app reads; an empty table is still a valid tree.
+    database.exec({ sql: "SELECT COUNT(*) FROM persons", returnValue: "resultRows" });
+    return true;
+  } catch {
+    return false;
+  } finally {
+    database.close();
+  }
+}
+
+/**
+ * Recovers a tree entered on the sql.js build, which stored the database in
+ * IndexedDB instead of OPFS.
+ *
+ * Runs only when this browser has no trees at all, so it can never shadow data
+ * entered on this build. The legacy blob is left in IndexedDB untouched: it is
+ * the only copy until the import is proven, and keeping it makes the import
+ * retryable.
+ */
+async function importLegacyIndexedDbTreeIfNeeded(): Promise<void> {
+  if (listTreesInternal().length) return;
+  // An OPFS-era legacy file is handled by migrateLegacyTreeIfNeeded instead.
+  if (await opfsEntryExists(LEGACY_TREE_FILE)) return;
+  if (await opfsEntryExists(IMPORTED_LEGACY_TREE_FILE)) return;
+
+  const bytes = await readLegacySqliteBytes();
+  if (!bytes || !looksLikeSqliteFile(bytes)) return;
+
+  await writeOpfsFile(IMPORTED_LEGACY_TREE_FILE, bytes);
+  if (!importedTreeHasPeople(IMPORTED_LEGACY_TREE_FILE)) {
+    // Only the copy just written is discarded; the IndexedDB original stays, so
+    // a future build can try again on a blob this one could not read.
+    await deleteOpfsFile(IMPORTED_LEGACY_TREE_FILE);
+    return;
+  }
+
+  const timestamp = now();
+  run(
+    currentCatalog(),
+    "INSERT INTO trees (id, name, file_name, created_at, updated_at) VALUES (?, ?, ?, ?, ?)",
+    [IMPORTED_LEGACY_TREE_ID, "Cây nhập từ bản cũ", IMPORTED_LEGACY_TREE_FILE, timestamp, timestamp],
+  );
+  storeActiveTreeId(IMPORTED_LEGACY_TREE_ID);
+}
+
 async function initialize(): Promise<void> {
   if (catalogDatabase) return;
   const initialized = (await sqlite3InitModule()) as SqliteRuntime;
@@ -177,6 +247,7 @@ async function initialize(): Promise<void> {
   catalogDatabase = new initialized.oo1.OpfsDb(CATALOG_FILE);
   catalogDatabase.exec(CATALOG_SCHEMA_SQL);
   await migrateLegacyTreeIfNeeded();
+  await importLegacyIndexedDbTreeIfNeeded();
   const storedActiveTreeId = getStoredActiveTreeId();
   if (storedActiveTreeId) openTreeDatabase(getTreeRecord(storedActiveTreeId));
 }
