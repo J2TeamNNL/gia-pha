@@ -153,3 +153,107 @@ describe("family graph layout", () => {
     );
   });
 });
+
+describe("a family in its own component", () => {
+  // The first-run shape: someone records themselves, then pastes a family list
+  // that is not yet linked to them.
+  function pastedFamily() {
+    const me = person({ is_anchor: true });
+    const grandfather = person();
+    const grandmother = person({ gender: "FEMALE" });
+    const father = person();
+    return {
+      me,
+      grandfather,
+      grandmother,
+      father,
+      persons: [me, grandfather, grandmother, father],
+      relationships: [
+        rel(grandfather.id, grandmother.id, "SPOUSE"),
+        rel(grandfather.id, father.id, "PARENT_OF"),
+        rel(grandmother.id, father.id, "PARENT_OF"),
+      ],
+    };
+  }
+
+  function rowOf(result: ReturnType<typeof computeLayout>, id: string) {
+    const node = result.nodes.find((candidate) => candidate.person.id === id);
+    expect(node, `node ${id} was dropped`).toBeDefined();
+    return node!.y;
+  }
+
+  it("keeps parents above their child instead of flattening the family", () => {
+    const f = pastedFamily();
+    const result = computeLayout({
+      persons: f.persons,
+      relationships: f.relationships,
+      focusId: f.me.id,
+      depth: null,
+    });
+
+    // The whole point: the child must not share a row with their parents.
+    expect(rowOf(result, f.father.id)).toBeGreaterThan(
+      rowOf(result, f.grandfather.id),
+    );
+    expect(rowOf(result, f.grandfather.id)).toBe(rowOf(result, f.grandmother.id));
+  });
+
+  it("separates the parents' row from the child's by one generation", () => {
+    const f = pastedFamily();
+    const result = computeLayout({
+      persons: f.persons,
+      relationships: f.relationships,
+      focusId: f.me.id,
+      depth: null,
+    });
+
+    expect(rowOf(result, f.father.id) - rowOf(result, f.grandfather.id)).toBe(
+      NODE_HEIGHT + V_GAP,
+    );
+  });
+
+  it("does not overlap the focus with the disconnected block", () => {
+    const f = pastedFamily();
+    const result = computeLayout({
+      persons: f.persons,
+      relationships: f.relationships,
+      focusId: f.me.id,
+      depth: null,
+    });
+
+    const rows = new Set(result.nodes.map((node) => node.y));
+    // Four people across three distinct rows: me, the couple, their child.
+    expect(rows.size).toBe(3);
+    expect(rowOf(result, f.me.id)).not.toBe(rowOf(result, f.grandfather.id));
+  });
+
+  it("still shows a disconnected family when generations shown is limited", () => {
+    const f = pastedFamily();
+    const result = computeLayout({
+      persons: f.persons,
+      relationships: f.relationships,
+      focusId: f.me.id,
+      depth: 1,
+    });
+
+    // Depth counts distance from the focus, which does not describe anyone in
+    // another component; dropping them would hide data the family entered.
+    expect(result.nodes).toHaveLength(4);
+    expect(result.hiddenCount).toBe(0);
+  });
+
+  it("orders the focus's own relatives before another component", () => {
+    const me = person({ is_anchor: true });
+    const myFather = person();
+    const stranger = person();
+    const result = computeLayout({
+      persons: [stranger, me, myFather],
+      relationships: [rel(myFather.id, me.id, "PARENT_OF")],
+      focusId: me.id,
+      depth: null,
+    });
+
+    const order = result.nodes.map((node) => node.person.id);
+    expect(order.indexOf(myFather.id)).toBeLessThan(order.indexOf(stranger.id));
+  });
+});

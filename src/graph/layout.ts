@@ -122,25 +122,43 @@ export function computeLayout(input: LayoutInput): LayoutResult {
 
   const adjacency = buildAdjacency(relationships);
   const generation = assignGenerations(focusId, adjacency);
-  // Disconnected people are placed one generation below the deepest row so
-  // they stay reachable rather than silently invisible.
-  const knownGenerations = [...generation.values()];
-  const orphanGeneration = knownGenerations.length
-    ? Math.max(...knownGenerations) + 1
-    : 0;
+  // Everyone the focus can reach, measured in generations from the focus.
+  const focusComponent = new Set(generation.keys());
+
+  // A tree is a forest: whole families can sit in their own component, and a
+  // family pasted in before anyone links themselves to it is the common case.
+  // Walk each such component from one of its own members so it keeps its
+  // parent-child structure, then drop the whole block below what is placed
+  // already. Assigning them all one shared row instead would flatten a
+  // grandparent, a parent and a child onto the same line.
+  let nextBlockTop = generation.size ? Math.max(...generation.values()) + 1 : 0;
   for (const person of persons) {
-    if (!generation.has(person.id)) generation.set(person.id, orphanGeneration);
+    if (generation.has(person.id)) continue;
+    const local = assignGenerations(person.id, adjacency);
+    const localValues = [...local.values()];
+    // The seed sits at 0 and its ancestors go negative, so shift the whole
+    // block down until its topmost row lands on the next free row.
+    const offset = nextBlockTop - Math.min(...localValues);
+    for (const [id, localGeneration] of local) {
+      generation.set(id, localGeneration + offset);
+    }
+    nextBlockTop = Math.max(...localValues) + offset + 1;
   }
 
   // Depth filter, then the visible-node guard (closest generations win).
+  // "Generations shown" counts distance from the focus, which says nothing
+  // about a person in a different component — those are never filtered by it,
+  // only by the node cap below, and they queue after the focus's own family.
   let visible = persons.filter((person) => {
     if (depth === null) return true;
+    if (!focusComponent.has(person.id)) return true;
     return Math.abs(generation.get(person.id)!) <= depth;
   });
-  visible.sort(
-    (a, b) =>
-      Math.abs(generation.get(a.id)!) - Math.abs(generation.get(b.id)!),
-  );
+  const sortKey = (id: string) =>
+    focusComponent.has(id)
+      ? Math.abs(generation.get(id)!)
+      : Number.MAX_SAFE_INTEGER;
+  visible.sort((a, b) => sortKey(a.id) - sortKey(b.id));
   if (visible.length > MAX_VISIBLE_NODES) {
     visible = visible.slice(0, MAX_VISIBLE_NODES);
   }
