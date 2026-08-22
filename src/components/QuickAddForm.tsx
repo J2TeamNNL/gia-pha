@@ -7,10 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useTreeStore } from "@/store/treeStore";
-import { createPerson, createRelationship } from "@/db/persons";
+import { useTranslation } from "@/i18n/useTranslation";
+import { createPersonWithRelationships, type PendingLink } from "@/db/persons";
 import type { Gender } from "@/db/types";
 import { cn } from "@/lib/utils";
 import { PhoneInput } from "./PhoneInput";
+
+
 
 interface QuickAddFormProps {
   onClose: () => void;
@@ -27,7 +30,9 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
     anchorPersonId,
     formPreFill,
     addRelationship,
+    relationships,
   } = useTreeStore();
+  const t = useTranslation();
 
   const [lastName, setLastName] = useState("");
   const [middleName, setMiddleName] = useState("");
@@ -65,72 +70,77 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!firstName.trim()) {
-      setError("Vui lòng nhập ít nhất Tên.");
+      setError(t.form.errors.nameRequired);
       return;
     }
+
+    // Anh/chị/em cần chung cha/mẹ với người được chọn. Nếu người đó CHƯA có
+    // cha/mẹ nào được ghi nhận, ta không thể xác định "anh/chị/em của ai" —
+    // chặn ở đây, TRƯỚC KHI tạo bất kỳ ai, để không ghi ra một người rồi
+    // báo thành công trong khi thực chất không nối được với ai (orphan).
+    let siblingParentIds: string[] = [];
+    if (formPreFill?.relType === "sibling") {
+      siblingParentIds = relationships
+        .filter(
+          (r) =>
+            r.rel_type === "PARENT_OF" &&
+            r.related_to_id === formPreFill.targetId,
+        )
+        .map((r) => r.person_id);
+      if (siblingParentIds.length === 0) {
+        setError(t.form.errors.siblingNeedsParent);
+        return;
+      }
+    }
+
+    // Dựng SẴN danh sách cạnh trước khi ghi: người mới và mọi quan hệ của họ
+    // được tạo trong MỘT transaction, nên nếu ràng buộc DB chặn một cạnh thì
+    // không còn người mồ côi nào sót lại.
+    const links: PendingLink[] = [];
+    switch (formPreFill?.relType) {
+      case "parent":
+        links.push({ otherId: formPreFill.targetId, rel_type: "PARENT_OF", direction: "from" });
+        break;
+      case "child":
+        links.push({ otherId: formPreFill.targetId, rel_type: "PARENT_OF", direction: "to" });
+        break;
+      case "spouse":
+        links.push({ otherId: formPreFill.targetId, rel_type: "SPOUSE", direction: "from" });
+        links.push({ otherId: formPreFill.targetId, rel_type: "SPOUSE", direction: "to" });
+        break;
+      case "sibling":
+        // Nối người mới với ĐÚNG bộ cha/mẹ đã ghi nhận của người được chọn
+        // — thành anh/chị/em thật (chung cha/mẹ), không phải node lạc.
+        for (const parentId of siblingParentIds) {
+          links.push({ otherId: parentId, rel_type: "PARENT_OF", direction: "to" });
+        }
+        break;
+    }
+
     setIsLoading(true);
     setError(null);
     try {
-      const newPerson = await createPerson({
-        first_name: firstName.trim(),
-        last_name: lastName.trim() || undefined,
-        middle_name: middleName.trim() || undefined,
-        gender,
-        is_living: true,
-        phone_number: fullPhoneNumber,
-        notes: note.trim() || undefined,
-      });
-      addPerson(newPerson);
-
-      // Add relationship if prefilled
-      if (formPreFill) {
-        let rel1, rel2;
-        switch (formPreFill.relType) {
-          case "parent":
-            // newPerson is parent of targetId
-            rel1 = await createRelationship(
-              newPerson.id,
-              formPreFill.targetId,
-              "PARENT_OF",
-            );
-            break;
-          case "child":
-            // targetId is parent of newPerson
-            rel1 = await createRelationship(
-              formPreFill.targetId,
-              newPerson.id,
-              "PARENT_OF",
-            );
-            break;
-          case "spouse":
-            rel1 = await createRelationship(
-              newPerson.id,
-              formPreFill.targetId,
-              "SPOUSE",
-            );
-            rel2 = await createRelationship(
-              formPreFill.targetId,
-              newPerson.id,
-              "SPOUSE",
-            );
-            break;
-          case "sibling":
-            // Sibling relationships are implicit through shared parents in standard genealogy,
-            // but for a quick MVP we might just want them linked if we don't have parents yet.
-            // Leaving unimplemented in DB for now to avoid schema drift, or could add "SIBLING" to types.ts later.
-            console.warn(
-              "Sibling direct relationship not yet supported by DB schema.",
-            );
-            break;
-        }
-        if (rel1) addRelationship(rel1);
-        if (rel2) addRelationship(rel2);
-      }
+      const { person, relationships: created } = await createPersonWithRelationships(
+        {
+          first_name: firstName.trim(),
+          last_name: lastName.trim() || undefined,
+          middle_name: middleName.trim() || undefined,
+          gender,
+          is_living: true,
+          phone_number: fullPhoneNumber,
+          notes: note.trim() || undefined,
+        },
+        links,
+      );
+      addPerson(person);
+      created.forEach((rel) => addRelationship(rel));
 
       if (phoneLocal.trim()) trackFieldUsage("phone_number");
       onClose();
     } catch (err) {
-      setError((err as Error).message || "Đã có lỗi xảy ra.");
+      // Tầng DB giờ chặn orphan/tự làm cha mình/chu trình bằng trigger — lỗi ở
+      // đây là THẬT (đã throw), không phải case đã được validate ở trên.
+      setError((err as Error).message || t.form.errors.genericError);
     } finally {
       setIsLoading(false);
     }
@@ -149,7 +159,7 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
           <span className="font-semibold text-base">
             {!formPreFill && "Thêm thành viên"}
             {formPreFill?.relType === "parent" && "Thêm cha/mẹ"}
-            {formPreFill?.relType === "child" && "Thêm con cái"}
+            {formPreFill?.relType === "child" && "Thêm con"}
             {formPreFill?.relType === "spouse" && "Thêm vợ/chồng"}
             {formPreFill?.relType === "sibling" && "Thêm anh/chị/em"}
           </span>
@@ -239,11 +249,8 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
         )}
       </div>
 
-      {/* Gender */}
       <div className="space-y-1.5">
-        <Label>
-          Giới tính <span className="text-red-500">*</span>
-        </Label>
+        <Label>Giới tính <span className="text-red-500">*</span></Label>
         <div className="flex gap-2">
           {(["MALE", "FEMALE"] as Gender[]).map((g) => (
             <button
@@ -262,6 +269,7 @@ export function QuickAddForm({ onClose }: QuickAddFormProps) {
           ))}
         </div>
       </div>
+
 
       {/* Smart Memory phone */}
       {hasSavedPhone && (

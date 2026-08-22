@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { FamilyTreeCanvas } from "@/components/FamilyTreeCanvas";
 import { SidePanel } from "@/components/SidePanel";
 import { OnboardingScreen } from "@/components/OnboardingScreen";
@@ -7,11 +8,29 @@ import { useTreeStore } from "@/store/treeStore";
 import { useTranslation } from "@/i18n/useTranslation";
 import { TreePine, Plus, Globe } from "lucide-react";
 import type { Locale } from "@/i18n";
+import { BackupControls } from "@/components/backup-controls";
 
 export default function Home() {
   const { openForm, isOnboarding, persons, locale, setLocale } = useTreeStore();
   const t = useTranslation();
   const showOnboarding = isOnboarding && persons.length === 0;
+
+  // Dev helper: window.__giapha.seed() trong console để reset + seed demo data.
+  // Chỉ nạp ở dev — seedDemoData() mở đầu bằng DELETE FROM persons, không được
+  // có mặt trong bundle production.
+  useEffect(() => {
+    if (process.env.NODE_ENV === "production") return;
+    let cancelled = false;
+    void import("@/db/persons").then(({ seedDemoData }) => {
+      if (cancelled) return;
+      (window as Window & { __giapha?: { seed: () => Promise<void> } }).__giapha =
+        { seed: seedDemoData };
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
 
   const LOCALES: { code: Locale; label: string }[] = [
     { code: "vi", label: "🇻🇳 VI" },
@@ -49,6 +68,8 @@ export default function Home() {
               </button>
             ))}
           </div>
+
+          {!showOnboarding && <BackupControls />}
 
           {!showOnboarding && (
             <button

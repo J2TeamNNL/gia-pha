@@ -50,19 +50,48 @@ export const en: Dictionary = {
     errors: {
       nameRequired: "Please enter at least the first name.",
       genericError: "An error occurred.",
+      siblingNeedsParent:
+        "This person has no recorded parent yet, so a sibling can't be linked. Add a parent for this person first.",
     },
   },
 
+  backup: {
+    export: "Export file",
+    import: "Import file",
+    exported: "Downloaded",
+    restored: "Imported",
+    confirmTitle: "Replace the whole tree with this file?",
+    confirmBody:
+      "The tree on this device will be replaced. The current version is downloaded to your machine first so you can go back.",
+    currentTree: "Current tree",
+    incomingFile: "Incoming file",
+    persons: "people",
+    relationships: "relationships",
+    cancel: "Cancel",
+    confirm: "Replace",
+    working: "Working…",
+  },
   canvas: {
     emptyTitle: "Empty Family Tree",
     emptyDesc: "Start by adding the first member — an ancestor or yourself.",
     addFirst: "Add First Member",
     membersCount: "members",
     relationships: "relationships",
+    loadErrorTitle: "Couldn't load the family tree",
+    reload: "Reload page",
+  },
+  viewport: {
+    zoomIn: "Zoom in",
+    zoomOut: "Zoom out",
+    fit: "Fit to screen",
+    reset: "Reset to 100%",
+    canvasLabel:
+      "Family tree — scroll to pan, Ctrl/Cmd + scroll or pinch to zoom, arrow keys to pan",
   },
 
   profile: {
     alive: "Living",
+    statusUnknown: "Unknown",
     deceased: "Deceased",
     phone: "📞 Phone",
     address: "📍 Address",

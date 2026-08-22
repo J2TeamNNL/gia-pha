@@ -7,7 +7,8 @@ export interface Person {
   middle_name?: string;
   title_prefix?: string;
   gender: Gender;
-  is_living: boolean;
+  /** `undefined` = KHÔNG RÕ. Đừng đọc trực tiếp — dùng `lifeStatus()` ở `src/lib/person-status.ts`. */
+  is_living?: boolean;
 
   birth_year?: number;
   birth_month?: number;

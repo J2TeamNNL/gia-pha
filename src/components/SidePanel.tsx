@@ -1,11 +1,29 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { useTreeStore } from "@/store/treeStore";
 import { useTranslation } from "@/i18n/useTranslation";
 import { QuickAddForm } from "./QuickAddForm";
 import { cn } from "@/lib/utils";
+import { lifeStatus } from "@/lib/person-status";
+
+/** Tôn trọng `prefers-reduced-motion` — tắt animation trang trí khi user đặt. */
+function usePrefersReducedMotion(): boolean {
+  const [reduced, setReduced] = useState(() =>
+    typeof window === "undefined"
+      ? false
+      : window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const onChange = (e: MediaQueryListEvent) => setReduced(e.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+  return reduced;
+}
 
 export function SidePanel() {
   const {
@@ -19,6 +37,7 @@ export function SidePanel() {
   const t = useTranslation();
   const selectedPerson = persons.find((p) => p.id === selectedPersonId);
   const showPanel = isFormOpen || !!selectedPerson;
+  const reducedMotion = usePrefersReducedMotion();
 
   return (
     <AnimatePresence>
@@ -28,7 +47,11 @@ export function SidePanel() {
           initial={{ x: "100%" }}
           animate={{ x: 0 }}
           exit={{ x: "100%" }}
-          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          transition={
+            reducedMotion
+              ? { duration: 0 }
+              : { type: "spring", stiffness: 300, damping: 30 }
+          }
           className="absolute inset-y-0 right-0 z-40 sm:relative w-full sm:w-80 lg:w-96 bg-white border-l border-stone-200 shadow-xl flex flex-col overflow-y-auto"
         >
           <div className="p-5 flex-1">
@@ -36,13 +59,18 @@ export function SidePanel() {
               <QuickAddForm onClose={closeForm} />
             ) : selectedPerson ? (
               <div className="space-y-4 relative">
+                {/* Trước: p-1.5 + size-4 icon ≈ 28px (dưới ngưỡng 44px),
+                    không tên (không title/aria-label). Sau: size-11 (44px),
+                    aria-label. Xem docs/tree-layout.md §10. */}
                 <button
                   onClick={() => selectPerson(null)}
-                  className="absolute top-0 right-0 p-1.5 text-stone-400 hover:text-stone-600 bg-stone-50 hover:bg-stone-100 rounded-full transition-colors"
+                  title={locale === "vi" ? "Đóng" : "Close"}
+                  aria-label={locale === "vi" ? "Đóng" : "Close"}
+                  className="absolute -top-1 -right-1 size-11 flex items-center justify-center text-stone-400 hover:text-stone-600 bg-stone-50 hover:bg-stone-100 rounded-full transition-colors"
                 >
                   <X className="size-4" />
                 </button>
-                <div className="flex items-center gap-3 pb-4 border-b border-stone-100 pr-8">
+                <div className="flex items-center gap-3 pb-4 border-b border-stone-100 pr-12">
                   <div
                     className={cn(
                       "size-14 rounded-full flex items-center justify-center text-white font-bold text-lg bg-gradient-to-br shadow-inner",
@@ -71,17 +99,25 @@ export function SidePanel() {
                         {selectedPerson.title_prefix}
                       </p>
                     )}
+                    {/* Ba trạng thái, không hai. "Chưa rõ" là câu trả lời hợp
+                        lệ với tổ tiên xa — xem src/lib/person-status.ts */}
                     <span
                       className={cn(
                         "text-xs px-2 py-0.5 rounded-full",
-                        selectedPerson.is_living
-                          ? "bg-green-100 text-green-700"
-                          : "bg-stone-200 text-stone-500",
+                        {
+                          living: "bg-green-100 text-green-800",
+                          deceased: "bg-stone-200 text-stone-700",
+                          unknown: "bg-amber-100 text-amber-800",
+                        }[lifeStatus(selectedPerson)],
                       )}
                     >
-                      {selectedPerson.is_living
-                        ? t.profile.alive
-                        : t.profile.deceased}
+                      {
+                        {
+                          living: t.profile.alive,
+                          deceased: t.profile.deceased,
+                          unknown: t.profile.statusUnknown,
+                        }[lifeStatus(selectedPerson)]
+                      }
                     </span>
                     {selectedPerson.is_anchor && (
                       <span className="ml-1 text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">

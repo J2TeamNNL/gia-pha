@@ -38,7 +38,26 @@ export interface Dictionary {
     firstNamePlaceholder: string;
     phonePlaceholder: string;
     notePlaceholder: string;
-    errors: { nameRequired: string; genericError: string };
+    errors: {
+      nameRequired: string;
+      genericError: string;
+      siblingNeedsParent: string;
+    };
+  };
+  backup: {
+    export: string;
+    import: string;
+    exported: string;
+    restored: string;
+    confirmTitle: string;
+    confirmBody: string;
+    currentTree: string;
+    incomingFile: string;
+    persons: string;
+    relationships: string;
+    cancel: string;
+    confirm: string;
+    working: string;
   };
   canvas: {
     emptyTitle: string;
@@ -46,9 +65,19 @@ export interface Dictionary {
     addFirst: string;
     membersCount: string;
     relationships: string;
+    loadErrorTitle: string;
+    reload: string;
+  };
+  viewport: {
+    zoomIn: string;
+    zoomOut: string;
+    fit: string;
+    reset: string;
+    canvasLabel: string;
   };
   profile: {
     alive: string;
+    statusUnknown: string;
     deceased: string;
     phone: string;
     address: string;
@@ -113,10 +142,28 @@ export const vi: Dictionary = {
     errors: {
       nameRequired: "Vui lòng nhập ít nhất Tên.",
       genericError: "Đã có lỗi xảy ra.",
+      siblingNeedsParent:
+        "Người này chưa có cha/mẹ được ghi nhận, nên chưa thể xác định anh/chị/em. Hãy thêm cha hoặc mẹ cho người này trước.",
     },
   },
 
   // Canvas
+  backup: {
+    export: "Xuất file",
+    import: "Nhập file",
+    exported: "Đã tải về",
+    restored: "Đã nhập",
+    confirmTitle: "Thay toàn bộ cây bằng file này?",
+    confirmBody:
+      "Cây đang có trên thiết bị này sẽ bị thay thế. Trước khi thay, bản hiện tại được tải về máy bạn để có thể quay lại.",
+    currentTree: "Cây hiện tại",
+    incomingFile: "File sắp nhập",
+    persons: "người",
+    relationships: "quan hệ",
+    cancel: "Huỷ",
+    confirm: "Thay thế",
+    working: "Đang xử lý…",
+  },
   canvas: {
     emptyTitle: "Cây Gia Phả trống",
     emptyDesc:
@@ -124,11 +171,22 @@ export const vi: Dictionary = {
     addFirst: "Thêm thành viên đầu tiên",
     membersCount: "thành viên",
     relationships: "mối quan hệ",
+    loadErrorTitle: "Không tải được cây gia phả",
+    reload: "Tải lại trang",
+  },
+  viewport: {
+    zoomIn: "Phóng to",
+    zoomOut: "Thu nhỏ",
+    fit: "Vừa khung",
+    reset: "Về 100%",
+    canvasLabel:
+      "Cây gia phả — cuộn để di chuyển, Ctrl/Cmd + cuộn hoặc chụm hai ngón để phóng to/thu nhỏ, phím mũi tên để di chuyển",
   },
 
   // Profile panel
   profile: {
     alive: "Còn sống",
+    statusUnknown: "Chưa rõ",
     deceased: "Đã mất",
     phone: "📞 SĐT",
     address: "📍 Địa chỉ",
