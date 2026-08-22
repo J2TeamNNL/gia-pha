@@ -171,11 +171,26 @@ async function migrateLegacyTreeIfNeeded(): Promise<void> {
   storeActiveTreeId(LEGACY_TREE_ID);
 }
 
+/**
+ * The synchronous OPFS write handle is worker-only and still missing from the
+ * bundled DOM types, so the shape this code relies on is declared here.
+ */
+interface SyncAccessHandle {
+  truncate(size: number): void;
+  write(buffer: Uint8Array, options?: { at?: number }): number;
+  flush(): void;
+  close(): void;
+}
+
 /** Writes bytes to an OPFS file, replacing whatever was there. */
 async function writeOpfsFile(fileName: string, bytes: Uint8Array): Promise<void> {
   const entry = await resolveOpfsEntry(fileName);
   if (!entry) throw new Error(`Cannot resolve an OPFS path for ${fileName}.`);
-  const handle = await entry.directory.getFileHandle(entry.file, { create: true });
+  const handle = (await entry.directory.getFileHandle(entry.file, {
+    create: true,
+  })) as FileSystemFileHandle & {
+    createSyncAccessHandle(): Promise<SyncAccessHandle>;
+  };
   const access = await handle.createSyncAccessHandle();
   try {
     access.truncate(0);
