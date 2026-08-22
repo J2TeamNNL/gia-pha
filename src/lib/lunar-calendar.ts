@@ -15,6 +15,11 @@
  * Xem `docs/culture-vietnam.md` §6 cho luật domain: lưu đúng lịch gia đình
  * khai, `is_leap_month` bắt buộc, ngoài khoảng năm hỗ trợ phải báo rõ chứ
  * không đoán.
+ *
+ * GHI NHẬN NGUỒN VÀ LICENSE: công thức số học ở đây giữ đúng bản của Hồ Ngọc
+ * Đức, nên file này là tác phẩm phái sinh chứ không phải cài lại độc lập.
+ * Điều kiện sử dụng **chưa được xác minh** — xem `docs/credits.md` §1 trước khi
+ * phát hành công khai.
  */
 
 /** Năm dương lịch nhỏ nhất được đảm bảo chính xác — xem báo cáo triển khai. */

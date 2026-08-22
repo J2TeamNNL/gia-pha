@@ -39,12 +39,32 @@ Các ý tưởng gốc của dự án, giữ nguyên trên roadmap chính thức
 
 Bắt đầu tại [`.docs/README.md`](.docs/README.md) — dẫn đến product overview, kiến trúc, data model, quyết định, changelog và task backlog.
 
-## Tham khảo
+Thêm vào đó, trong [`docs/`](docs/):
 
-Phân tích rút kinh nghiệm từ các dự án mã nguồn mở:
+- [`culture-vietnam.md`](docs/culture-vietnam.md) — luật domain gia phả Việt Nam, **đọc trước khi thiết kế field**
+- [`decisions.md`](docs/decisions.md) — vì sao dự án đi hướng này, cái gì bỏ có chủ đích, cái gì còn nợ
+- [`research-index.md`](docs/research-index.md) — đường vào toàn bộ research trong [`plans/reports/`](plans/reports/)
+- [`credits.md`](docs/credits.md) — ghi nhận nguồn
+
+## Ghi nhận nguồn
+
+Danh sách đầy đủ, kèm phân biệt cái gì đã lấy vào code và cái gì chỉ đọc để học:
+[`docs/credits.md`](docs/credits.md).
+
+**Đã lấy vào code:**
+
+- Thuật toán âm lịch Việt Nam của **Hồ Ngọc Đức** (điểm Sóc + kinh độ mặt trời, công thức
+  [Jean Meeus](https://en.wikipedia.org/wiki/Jean_Meeus) rút gọn) — `src/lib/lunar-calendar.ts`.
+  ⚠️ **Điều kiện sử dụng chưa xác minh**, phải làm rõ trước khi phát hành công khai.
+- [shadcn/ui](https://ui.shadcn.com) (MIT) — `src/components/ui/`.
+
+**Chỉ đọc để học hành vi, không copy dòng code nào:**
 
 - [Gia-Pha-Dien-Tu](https://github.com/0xAstroAlpha/Gia-Pha-Dien-Tu)
 - [giapha-os](https://github.com/homielab/giapha-os)
 - [AncestorTree](https://github.com/Minh-Tam-Solution/AncestorTree)
+- KinTree — app Android `dev.creaton.kintree`
+
+Ba repo trên **không có file LICENSE**, nên mặc định tác giả giữ toàn quyền: đọc được, copy thì không.
 
 ## Vibe code with ❤️ by J2TeamNNL
