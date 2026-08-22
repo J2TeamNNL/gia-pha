@@ -110,12 +110,32 @@ export async function setAnchorPerson(id: string): Promise<void> {
   await db.run("UPDATE persons SET is_anchor = 1 WHERE id = ?", [id]);
 }
 
+/**
+ * Columns updatePerson may write. Values are always bound as parameters, but
+ * column names are interpolated into the statement, so they are matched against
+ * this set rather than taken from the caller's object keys. id is excluded: a
+ * person's identity is not editable.
+ */
+const UPDATABLE_PERSON_COLUMNS = new Set<string>(
+  PERSON_COLUMNS.filter((column) => column !== "id"),
+);
+
 export async function updatePerson(
   id: string,
   data: Partial<Omit<Person, "id">>,
 ): Promise<void> {
   const entries = Object.entries(data);
   if (!entries.length) return;
+
+  const unknown = entries
+    .map(([column]) => column)
+    .filter((column) => !UPDATABLE_PERSON_COLUMNS.has(column));
+  if (unknown.length) {
+    // Refusing beats skipping: a dropped column would look like a saved edit
+    // that quietly did nothing.
+    throw new Error(`Cannot update unknown person columns: ${unknown.join(", ")}.`);
+  }
+
   const db = await getDb();
   const assignments = entries.map(([column]) => `${column} = ?`).join(", ");
   const params = entries.map(([, value]) => toSqlValue(value));
