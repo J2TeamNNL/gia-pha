@@ -1,0 +1,581 @@
+<title>Gia Phả Sau Nhánh Rẽ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+  /* ── Tokens: light is the base set ─────────────────────────────────── */
+  :root {
+    --paper:        #f5f6f9;
+    --surface:      #ffffff;
+    --surface-sunk: #eceef4;
+    --line:         #d6dae6;
+    --line-soft:    #e4e7ef;
+
+    --ink:          #141a26;
+    --ink-mid:      #464f63;
+    --ink-soft:     #6b7488;
+
+    --accent:       #3d5a9b;
+    --accent-deep:  #263a68;
+    --accent-wash:  #e7ebf5;
+
+    --pass:         #3f7a5e;
+    --pass-wash:    #e2efe8;
+    --warn:         #8d6a2b;
+    --warn-wash:    #f4ecdb;
+    --crit:         #9d4457;
+    --crit-wash:    #f7e4e8;
+
+    --shadow:       0 1px 2px rgba(20, 26, 38, .05), 0 8px 24px -12px rgba(20, 26, 38, .14);
+
+    --f-display: "Newsreader", ui-serif, Georgia, serif;
+    --f-body:    "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+    --f-mono:    "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  /* System-dark: no stamp on <html>, so only the media query separates it.
+     Guarded so an explicit light choice still wins. */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:        #0f141d;
+      --surface:      #161d28;
+      --surface-sunk: #1c2532;
+      --line:         #2b3546;
+      --line-soft:    #232c3b;
+
+      --ink:          #e8ebf2;
+      --ink-mid:      #a8b1c4;
+      --ink-soft:     #7d879c;
+
+      --accent:       #8ba6e0;
+      --accent-deep:  #b3c6ef;
+      --accent-wash:  #1d2740;
+
+      --pass:         #6fb994;
+      --pass-wash:    #16281f;
+      --warn:         #d0a558;
+      --warn-wash:    #2a2113;
+      --crit:         #dd8697;
+      --crit-wash:    #2c161c;
+
+      --shadow:       0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -12px rgba(0, 0, 0, .6);
+    }
+  }
+
+  /* Explicit dark choice wins over a light OS. */
+  :root[data-theme="dark"] {
+    --paper:        #0f141d;
+    --surface:      #161d28;
+    --surface-sunk: #1c2532;
+    --line:         #2b3546;
+    --line-soft:    #232c3b;
+
+    --ink:          #e8ebf2;
+    --ink-mid:      #a8b1c4;
+    --ink-soft:     #7d879c;
+
+    --accent:       #8ba6e0;
+    --accent-deep:  #b3c6ef;
+    --accent-wash:  #1d2740;
+
+    --pass:         #6fb994;
+    --pass-wash:    #16281f;
+    --warn:         #d0a558;
+    --warn-wash:    #2a2113;
+    --crit:         #dd8697;
+    --crit-wash:    #2c161c;
+
+    --shadow:       0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px -12px rgba(0, 0, 0, .6);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--f-body);
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 60rem;
+    margin: 0 auto;
+    padding: clamp(1.75rem, 4vw, 4rem) clamp(1.15rem, 4vw, 2.5rem) 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(2.25rem, 4vw, 3.25rem);
+  }
+
+  /* ── Type scale ────────────────────────────────────────────────────── */
+  h1, h2, h3 { font-family: var(--f-display); font-weight: 500; text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(2.1rem, 5.5vw, 3.1rem); line-height: 1.08; letter-spacing: -.015em; }
+  h2 { font-size: clamp(1.3rem, 2.6vw, 1.6rem); line-height: 1.2; letter-spacing: -.008em; }
+  h3 { font-size: 1.02rem; font-family: var(--f-body); font-weight: 600; line-height: 1.35; }
+  p  { margin: 0; max-width: 65ch; }
+
+  .eyebrow {
+    font-family: var(--f-mono);
+    font-size: .69rem;
+    font-weight: 500;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+  }
+
+  .lede { font-size: 1.06rem; color: var(--ink-mid); max-width: 58ch; }
+  .note { font-size: .9rem; color: var(--ink-mid); }
+  code, .mono { font-family: var(--f-mono); font-size: .855em; }
+  code { background: var(--surface-sunk); padding: .1em .34em; border-radius: 3px; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  /* ── Masthead ──────────────────────────────────────────────────────── */
+  .masthead { display: flex; flex-direction: column; gap: .9rem; }
+  .masthead .rule {
+    height: 3px; width: 3.5rem; border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--pass));
+  }
+  .stamp {
+    display: flex; flex-wrap: wrap; gap: .4rem 1.15rem;
+    font-family: var(--f-mono); font-size: .74rem; color: var(--ink-soft);
+  }
+  .stamp b { color: var(--ink-mid); font-weight: 500; }
+
+  /* ── Section shell ─────────────────────────────────────────────────── */
+  section { display: flex; flex-direction: column; gap: 1.1rem; }
+  .sec-head { display: flex; flex-direction: column; gap: .35rem; }
+
+  /* ── Gate strip ────────────────────────────────────────────────────── */
+  .gates {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+    gap: .6rem;
+  }
+  .gate {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: .8rem .9rem;
+    display: flex; flex-direction: column; gap: .3rem;
+    position: relative; overflow: hidden;
+  }
+  .gate::before {
+    content: ""; position: absolute; inset: 0 auto 0 0; width: 3px;
+    background: var(--pass);
+  }
+  .gate .g-name {
+    font-family: var(--f-mono); font-size: .7rem; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--ink-soft);
+  }
+  .gate .g-val {
+    font-family: var(--f-display); font-size: 1.42rem; line-height: 1;
+    font-variant-numeric: tabular-nums; color: var(--ink);
+  }
+  .gate .g-sub { font-size: .76rem; color: var(--pass); font-weight: 500; }
+
+  /* ── Lineage diagram ───────────────────────────────────────────────── */
+  .figure {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    box-shadow: var(--shadow);
+    padding: 1.35rem 1.1rem 1rem;
+    display: flex; flex-direction: column; gap: .8rem;
+  }
+  .scroll-x { overflow-x: auto; }
+  .figure svg { display: block; min-width: 44rem; width: 100%; height: auto; }
+  figcaption { font-size: .84rem; color: var(--ink-mid); max-width: 62ch; }
+
+  /* ── Table ─────────────────────────────────────────────────────────── */
+  table { border-collapse: collapse; width: 100%; min-width: 33rem; font-size: .92rem; }
+  caption { text-align: left; font-size: .84rem; color: var(--ink-soft); padding-bottom: .6rem; }
+  th, td { text-align: left; padding: .62rem .8rem; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  thead th {
+    font-family: var(--f-mono); font-size: .69rem; letter-spacing: .1em;
+    text-transform: uppercase; color: var(--ink-soft); font-weight: 500;
+    border-bottom: 1px solid var(--line);
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.won { color: var(--ink); font-weight: 500; }
+  td.lost { color: var(--ink-soft); text-decoration: line-through; text-decoration-thickness: 1px; }
+  .table-shell {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 11px; padding: 1.1rem 1rem .5rem; box-shadow: var(--shadow);
+  }
+
+  /* ── Two-column ledger ─────────────────────────────────────────────── */
+  .ledger { display: grid; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); gap: .9rem; }
+  .col {
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 11px; padding: 1.05rem 1.1rem 1.15rem;
+    display: flex; flex-direction: column; gap: .85rem;
+  }
+  .col-head { display: flex; align-items: baseline; gap: .55rem; flex-wrap: wrap; }
+  .tag {
+    font-family: var(--f-mono); font-size: .66rem; font-weight: 500;
+    letter-spacing: .09em; text-transform: uppercase;
+    padding: .18rem .45rem; border-radius: 4px;
+  }
+  .tag.live { background: var(--pass-wash); color: var(--pass); }
+  .tag.idle { background: var(--warn-wash); color: var(--warn); }
+  ul.items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: .6rem; }
+  ul.items li { display: flex; gap: .6rem; align-items: baseline; font-size: .91rem; }
+  /* A flex item defaults to min-width:auto and will not shrink below its
+     content, so an unbreakable token could widen the card. Let it shrink. */
+  ul.items li > span:not(.dot):not(.meta) { min-width: 0; overflow-wrap: break-word; }
+  ul.items .dot { flex: none; width: 5px; height: 5px; border-radius: 50%; margin-top: .52rem; }
+  .col.is-live .dot { background: var(--pass); }
+  .col.is-idle .dot { background: var(--warn); }
+  ul.items .meta {
+    font-family: var(--f-mono); font-size: .73rem; color: var(--ink-soft);
+    white-space: nowrap; margin-left: auto; padding-left: .5rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ── Risks ─────────────────────────────────────────────────────────── */
+  .risks { display: flex; flex-direction: column; gap: .7rem; }
+  .risk {
+    background: var(--surface); border: 1px solid var(--line);
+    border-left: 3px solid var(--sev); border-radius: 0 10px 10px 0;
+    padding: .95rem 1.1rem; display: flex; flex-direction: column; gap: .45rem;
+  }
+  .risk.crit { --sev: var(--crit); }
+  .risk.high { --sev: var(--warn); }
+  .risk.med  { --sev: var(--accent); }
+  .risk-top { display: flex; align-items: baseline; gap: .6rem; flex-wrap: wrap; }
+  .sev-tag {
+    font-family: var(--f-mono); font-size: .65rem; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--sev);
+    padding: .16rem .42rem; border-radius: 4px; background: var(--sev-wash);
+  }
+  .risk.crit { --sev-wash: var(--crit-wash); }
+  .risk.high { --sev-wash: var(--warn-wash); }
+  .risk.med  { --sev-wash: var(--accent-wash); }
+  .risk p { font-size: .9rem; color: var(--ink-mid); }
+
+  /* ── Footer ────────────────────────────────────────────────────────── */
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 1.35rem;
+    display: flex; flex-direction: column; gap: .55rem;
+    font-size: .87rem; color: var(--ink-mid);
+  }
+  footer .path { font-family: var(--f-mono); font-size: .8rem; color: var(--accent); }
+
+  a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  a:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px;
+  }
+
+
+  /* SVG text and strokes are styled here, not with presentation attributes:
+     var() is not reliably substituted inside an SVG attribute. */
+  .lineage text { font-family: var(--f-body); }
+  .lineage .t-mono { font-family: var(--f-mono); }
+  .lineage .t-mid  { fill: var(--ink-mid); }
+  .lineage .t-soft { fill: var(--ink-soft); }
+  .lineage .t-ink  { fill: var(--ink); }
+  .lineage .t-pass { fill: var(--pass); }
+  .lineage .t-acc  { fill: var(--accent); }
+  .lineage .t-lead { font-weight: 600; }
+  .lineage .node-open { fill: var(--surface); stroke: var(--ink-mid); stroke-width: 2.5; }
+  .lineage .node-stop { fill: var(--surface); stroke: var(--ink-soft); stroke-width: 2.4; }
+  .lineage .n-pass { fill: var(--pass); }
+  .lineage .n-acc  { fill: var(--accent); }
+  .lineage .n-soft { fill: var(--ink-soft); }
+  .lineage .e-pass { fill: none; stroke: var(--pass); stroke-width: 2.4; }
+  .lineage .e-acc  { fill: none; stroke: var(--accent); stroke-width: 2.4; }
+  .lineage .e-soft { fill: none; stroke: var(--ink-soft); stroke-width: 2.4; }
+  .lineage .arrow  { fill: var(--accent); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div class="rule"></div>
+    <span class="eyebrow">Báo cáo trạng thái · 22 tháng 8, 2026</span>
+    <h1>Gia Phả sau nhánh rẽ</h1>
+    <p class="lede">
+      Ứng dụng gia phả Việt Nam, chạy hoàn toàn trong trình duyệt, không backend.
+      Hôm nay hai nhánh phát triển loại trừ nhau đã được hợp nhất — và việc đó
+      phơi ra một khoảng trống lớn hơn cả chuyện chọn framework.
+    </p>
+    <div class="stamp">
+      <span><b>main</b> a87120c</span>
+      <span><b>nền</b> Vite + sqlite-wasm/OPFS</span>
+      <span><b>mã nguồn</b> <span class="num">10 387</span> dòng</span>
+      <span><b>4 cổng CI</b> xanh</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">Kiểm chứng — chạy thật, không suy đoán</span>
+      <h2>Mọi cổng đều xanh</h2>
+    </div>
+    <div class="gates">
+      <div class="gate">
+        <span class="g-name">Lint</span>
+        <span class="g-val num">0</span>
+        <span class="g-sub">không lỗi</span>
+      </div>
+      <div class="gate">
+        <span class="g-name">Typecheck</span>
+        <span class="g-val num">0</span>
+        <span class="g-sub">không lỗi</span>
+      </div>
+      <div class="gate">
+        <span class="g-name">Unit test</span>
+        <span class="g-val num">180</span>
+        <span class="g-sub">25 file · pass hết</span>
+      </div>
+      <div class="gate">
+        <span class="g-name">E2E</span>
+        <span class="g-val num">7</span>
+        <span class="g-sub">Chromium · 12,6s</span>
+      </div>
+      <div class="gate">
+        <span class="g-name">Bundle</span>
+        <span class="g-val num">149</span>
+        <span class="g-sub">kB gzip + wasm 401</span>
+      </div>
+    </div>
+    <p class="note">
+      Trong 180 test có <span class="num">55</span> test mới thêm hôm nay. Trước đó
+      migration chưa từng chạy trên engine SQLite thật — test cũ chỉ ghi lại thứ tự
+      câu lệnh qua một executor giả.
+    </p>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">Dòng dõi của chính nó</span>
+      <h2>Một nền thắng, một nhánh được lưu</h2>
+    </div>
+    <figure class="figure">
+      <div class="scroll-x">
+        <svg class="lineage" viewBox="0 0 800 210" role="img"
+             aria-label="Sơ đồ: từ base 8ed7c2a ngày 6 tháng 3, dự án rẽ hai nhánh. Nhánh Vite với 19 commit trở thành main và nhận thêm 10 commit. Nhánh Next.js với 2 commit được lưu thành archive và dừng lại.">
+          <defs>
+            <marker id="tip" viewBox="0 0 10 10" refX="8" refY="5"
+                    markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path class="arrow" d="M 0 1 L 9 5 L 0 9 z"/>
+            </marker>
+          </defs>
+
+          <!-- base -->
+          <circle class="node-open" cx="52" cy="105" r="7.5"/>
+          <text class="t-mono t-mid" x="52" y="134" text-anchor="middle" font-size="10.5">8ed7c2a</text>
+          <text class="t-soft" x="52" y="149" text-anchor="middle" font-size="10">6 · 3</text>
+
+          <!-- divergence -->
+          <path class="e-pass" d="M 62 101 C 108 101 108 52 152 52"/>
+          <path class="e-soft" d="M 62 109 C 108 109 108 162 152 162"/>
+
+          <!-- upper branch: became the trunk -->
+          <line class="e-pass" x1="152" y1="52" x2="470" y2="52"/>
+          <g class="n-pass">
+            <circle cx="176" cy="52" r="4"/><circle cx="212" cy="52" r="4"/><circle cx="248" cy="52" r="4"/>
+            <circle cx="284" cy="52" r="4"/><circle cx="320" cy="52" r="4"/><circle cx="356" cy="52" r="4"/>
+          </g>
+          <text class="t-pass t-lead" x="176" y="36" font-size="11">19 commit · Vite + OPFS</text>
+          <circle class="n-pass" cx="470" cy="52" r="7"/>
+          <text class="t-mono t-mid" x="470" y="34" text-anchor="middle" font-size="10.5">a2ea4c3</text>
+
+          <!-- today's work -->
+          <line class="e-acc" x1="470" y1="52" x2="712" y2="52" marker-end="url(#tip)"/>
+          <g class="n-acc">
+            <circle cx="500" cy="52" r="4"/><circle cx="528" cy="52" r="4"/><circle cx="556" cy="52" r="4"/>
+            <circle cx="584" cy="52" r="4"/><circle cx="612" cy="52" r="4"/><circle cx="640" cy="52" r="4"/>
+            <circle cx="668" cy="52" r="4"/>
+          </g>
+          <text class="t-acc t-lead" x="500" y="36" font-size="11">+10 hôm nay</text>
+          <text class="t-mono t-ink" x="724" y="49" font-size="11.5" font-weight="700">main</text>
+          <text class="t-mono t-soft" x="724" y="63" font-size="9.5">a87120c</text>
+
+          <!-- lower branch: archived -->
+          <line class="e-soft" x1="152" y1="162" x2="352" y2="162"/>
+          <g class="n-soft">
+            <circle cx="196" cy="162" r="4"/><circle cx="244" cy="162" r="4"/>
+          </g>
+          <circle class="node-stop" cx="352" cy="162" r="6.5"/>
+          <line class="e-soft" x1="366" y1="150" x2="366" y2="174"/>
+          <text class="t-soft t-lead" x="196" y="147" font-size="11">Next.js + sql.js · 2 commit</text>
+          <text class="t-mono t-mid" x="386" y="159" font-size="10.5">archive/next-sqljs-260822</text>
+          <text class="t-soft" x="386" y="173" font-size="10">đã push · giữ cả việc chưa commit</text>
+        </svg>
+      </div>
+      <figcaption>
+        Hai nhánh rẽ từ một base <strong>5 tháng trước</strong> và đi hai hướng không
+        thể merge máy móc. Nhánh Vite thắng vì nó đã giải xong hai việc nhánh kia còn
+        chặn: mô hình đa thê và xưng hô theo phương ngữ vùng. Nhánh kia được lưu
+        nguyên vẹn, kể cả phần chưa commit.
+      </figcaption>
+    </figure>
+
+    <div class="table-shell scroll-x">
+      <table>
+        <caption>Bốn quyết định stack — mỗi dòng chỉ một bên sống sót</caption>
+        <thead>
+          <tr><th scope="col">Lớp</th><th scope="col">Đang dùng</th><th scope="col">Đã bỏ</th></tr>
+        </thead>
+        <tbody>
+          <tr><th scope="row">Framework</th><td class="won">Vite</td><td class="lost">Next.js</td></tr>
+          <tr><th scope="row">SQLite</th><td class="won">sqlite-wasm + OPFS + worker</td><td class="lost">sql.js + IndexedDB</td></tr>
+          <tr><th scope="row">Test</th><td class="won">Vitest</td><td class="lost">node:test</td></tr>
+          <tr><th scope="row">Package manager</th><td class="won">npm</td><td class="lost">pnpm</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">Điều đáng chú ý nhất</span>
+      <h2>Có mã chạy được, và có mã chưa ai gọi</h2>
+    </div>
+    <p>
+      Khảo sát hôm nay lộ ra một khoảng cách: gần <strong><span class="num">1 300</span>
+      dòng</strong> logic đã viết xong, có test đầy đủ, nhưng <strong>không một
+      thành phần UI nào gọi tới</strong>. Đó là công sức đã bỏ ra mà người dùng
+      chưa chạm được.
+    </p>
+    <div class="ledger">
+      <div class="col is-live">
+        <div class="col-head"><h3>Người dùng chạm được</h3><span class="tag live">đã nối UI</span></div>
+        <ul class="items">
+          <li><span class="dot"></span><span>Nhiều cây độc lập, xoá có xác nhận</span></li>
+          <li><span class="dot"></span><span>Xưng hô theo phương ngữ vùng</span><span class="meta">4 vùng</span></li>
+          <li><span class="dot"></span><span>Đồ thị phả hệ, layout trong worker, pan/zoom</span></li>
+          <li><span class="dot"></span><span>Tìm người không dấu, chọn bằng bàn phím</span></li>
+          <li><span class="dot"></span><span>Nhập cả gia đình dán từ bảng tính</span><span class="meta">445 dòng</span></li>
+          <li><span class="dot"></span><span>Danh sách họ hàng kèm cách gọi, xuất ra file</span></li>
+          <li><span class="dot"></span><span>Khai báo chi/nhánh</span></li>
+          <li><span class="dot"></span><span>Cài được như app, chạy offline</span><span class="meta">mới</span></li>
+        </ul>
+      </div>
+      <div class="col is-idle">
+        <div class="col-head"><h3>Đã viết, chưa nối</h3><span class="tag idle">chưa có đường vào</span></div>
+        <ul class="items">
+          <li><span class="dot"></span><span>Nhập GEDCOM, có báo cáo mất mát</span><span class="meta">849 dòng</span></li>
+          <li><span class="dot"></span><span>Chuyển đổi âm ↔ dương lịch, can chi</span><span class="meta">451 dòng</span></li>
+          <li><span class="dot"></span><span>Cột tháng nhuận trong schema</span><span class="meta">v6</span></li>
+          <li><span class="dot"></span><span>Đồng bộ Google Drive</span><span class="meta">còn là mock</span></li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">
+      Ba dòng đầu cột phải là việc port hôm nay — schema và thuật toán đã đúng và
+      có test, chỉ còn thiếu form để người dùng khai ngày âm. Dòng cuối,
+      <code>src/lib/drive.ts</code>, vẫn là ba hàm <code>console.log</code> như từ đầu.
+    </p>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">Rủi ro đang mở — xếp theo mức</span>
+      <h2>Ba việc cần quyết trước khi có người dùng thật</h2>
+    </div>
+    <div class="risks">
+
+      <div class="risk crit">
+        <div class="risk-top">
+          <span class="sev-tag">Nghiêm trọng</span>
+          <h3>Dữ liệu không có đường ra khỏi trình duyệt</h3>
+        </div>
+        <p>
+          Đây là ứng dụng local-first: cây phả hệ của một gia đình tồn tại ở
+          <strong>đúng một chỗ</strong>. Nhưng protocol của worker
+          <strong>không có request nào đọc bytes file DB</strong> — nên không có
+          backup ra file, không có export toàn bộ. Drive là mock. Thứ duy nhất xuất
+          được là CSV của danh sách họ hàng.
+        </p>
+        <p>
+          Cài PWA hôm nay đã chặn được việc iOS xoá storage sau ~7 ngày không dùng.
+          Nhưng đổi máy, hỏng máy, hay xoá dữ liệu trình duyệt thì vẫn mất trắng.
+        </p>
+      </div>
+
+      <div class="risk high">
+        <div class="risk-top">
+          <span class="sev-tag">Cao</span>
+          <h3>Production chưa có header cross-origin isolation</h3>
+        </div>
+        <p>
+          <code>sqlite-wasm</code> cần <code>SharedArrayBuffer</code>, tức là cần
+          <code>COOP</code> và <code>COEP</code>. <code>vite.config.ts</code> chỉ đặt
+          hai header đó cho <code>server</code> và <code>preview</code> — nghĩa là
+          chỉ ở dev. Repo <strong>chưa có config deploy nào</strong>. Deploy lên host
+          không gửi hai header đó thì app <strong>không mở được database</strong>.
+        </p>
+      </div>
+
+      <div class="risk med">
+        <div class="risk-top">
+          <span class="sev-tag">Trung bình</span>
+          <h3>File cũ vẫn có một bảng khoá ngoại không bảo vệ được</h3>
+        </div>
+        <p>
+          Migration v1 cố ý dùng <code>CREATE TABLE IF NOT EXISTS</code> để không
+          ghi đè dữ liệu sẵn có — nên với file tạo từ bản sql.js, bảng
+          <code>relationships</code> giữ định nghĩa cũ <em>không có</em> mệnh đề
+          <code>FOREIGN KEY</code>, và SQLite không cho thêm FK bằng
+          <code>ALTER TABLE</code>. Sửa được bằng trigger, chưa làm.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <span class="eyebrow">Việc đã sửa hôm nay mà không ai yêu cầu</span>
+      <h2>Bốn thứ khảo sát tự phơi ra</h2>
+    </div>
+    <div class="table-shell scroll-x">
+      <table>
+        <thead>
+          <tr><th scope="col">Vấn đề</th><th scope="col">Vì sao nó quan trọng</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Cây cũ nằm trong IndexedDB<br><span class="mono" style="color:var(--crit)">mất dữ liệu</span></th>
+            <td>Bản sql.js lưu DB thành blob trong IndexedDB; bản mới chỉ đọc OPFS và không có một dòng IndexedDB nào. Deploy nguyên trạng thì mọi gia đình đã nhập dữ liệu <strong>mở app ra thấy cây rỗng</strong>.</td>
+          </tr>
+          <tr>
+            <th scope="row">Tên cột ghép thẳng vào câu SQL</th>
+            <td><code>updatePerson</code> lấy tên cột từ key object của caller rồi nội suy vào statement. Đường insert đã có allowlist, đường update thì chưa.</td>
+          </tr>
+          <tr>
+            <th scope="row">Test quét cả repo đối thủ</th>
+            <td><code>vitest.config.ts</code> chỉ loại <code>e2e/</code>, nên nó gom luôn <code>references/</code> — CI clone mới thì xanh, máy dev thì đỏ.</td>
+          </tr>
+          <tr>
+            <th scope="row">865 kB wasm chết trong <code>public/</code></th>
+            <td><code>sql-wasm.wasm</code> và 5 SVG mặc định của Next còn sót lại từ lần chuyển runtime. Không chỗ nào tham chiếu.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer>
+    <p><strong>Đọc tiếp</strong> — vì sao đi hướng này, cái gì bỏ có chủ đích, cái gì còn nợ:</p>
+    <p class="path">docs/decisions.md</p>
+    <p class="path">plans/reports/analysis-260822-1833-fork-main-vs-origin.md</p>
+    <p class="note" style="margin-top:.4rem">
+      Luật domain gia phả Việt Nam — thứ sống lâu hơn mọi schema — nằm ở
+      <span class="mono">docs/culture-vietnam.md</span>, kèm bằng chứng trong
+      <span class="mono">plans/reports/</span>.
+    </p>
+  </footer>
+
+</div>
