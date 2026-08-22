@@ -4,6 +4,48 @@
 
 This log records both implementation and durable documentation changes. Dates use `YYYY-MM-DD`.
 
+## 2026-08-22 - Priorities re-cut against a confirmed milestone scope
+
+The owner confirmed who this milestone is for: one user, their own machine, real family data,
+a tree of a few hundred people. Several priorities were being carried against a scope nobody
+had stated.
+
+**What**
+
+- `IO-001` (Native JSON export/import) raised P2 → **P0** and marked blocking. `brief.md`
+  already listed import/export among the core MVP criteria, so P2 was the inconsistency, not
+  the raise.
+- `PERF-001` → `DEFERRED`. The real tree is a few hundred people, inside the existing
+  500-visible-node guard. The 10,000 figure stays a target in `brief.md`.
+- `REL-001` → `DEFERRED`. Nothing is being released, so there is nothing to prepare.
+- Added `OPS-002` (`OUT_OF_SCOPE`) for the isolation-header work `OPS-001` referenced but which
+  nobody ever created as a task. It must reopen before anyone else is given a link.
+- Added `MIG-001`, `CAL-001`, `PWA-001` as `DONE` for work that shipped without task rows: the
+  IndexedDB recovery path, the lunar leap-month column plus converter, and the installable PWA.
+- Two new status values, `DEFERRED` and `OUT_OF_SCOPE`, each carrying a date, a reason, and what
+  would reopen it.
+- `README.md` now warns plainly that no export exists and that real genealogy data should not be
+  entered until `IO-001` ships. `CLAUDE.md` states the milestone scope so an agent prioritises
+  against it.
+
+**Why**
+
+- A tree exists only in this browser's OPFS. No export, no sync: clearing site data or changing
+  machines loses it permanently, and genealogy is not reproducible — the people who remember are
+  the source. Everything else on the list was being sequenced ahead of that.
+- `CAL-001` and `PWA-001` shipped ahead of their milestone. Recording them as such keeps the
+  backlog from implying v0.2 scope grew, and stops a later session rebuilding them.
+
+**Impact**
+
+- No code changed. One P0 remains besides `IO-001`: `PRIV-001`.
+- Deviation from `brief.md` on the 10,000-person criterion is deliberate and recorded in
+  `docs/decisions.md` §6 rather than by editing a `TARGET` document.
+
+**References**
+
+- `.docs/v0.2/tasks.md`, `docs/decisions.md` §6, `README.md`, `CLAUDE.md`
+
 ## 2026-08-17 - Documentation caught up with what shipped
 
 **What**

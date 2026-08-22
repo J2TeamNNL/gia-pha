@@ -9,7 +9,12 @@ Website quản lý gia phả với mục tiêu bảo mật tối đa, dễ dàng
 - Baseline lint, typecheck, unit test, build và Playwright đã chạy trong CI.
 - Browser thiếu HTTPS, COOP/COEP, SharedArrayBuffer, Worker hoặc OPFS sẽ thấy lỗi rõ ràng; không fallback sang storage tạm.
 
-Chưa dùng runtime hiện tại để lưu dữ liệu gia phả quan trọng hoặc deploy production cho đến khi các task trong `.docs/v0.2/tasks.md` hoàn thành.
+> ⚠️ **Chưa có đường xuất dữ liệu ra khỏi trình duyệt.** Một cây gia phả hiện tồn tại ở đúng một
+> chỗ — OPFS của trình duyệt trên máy đang dùng. Không backup, không sync: xoá dữ liệu trình
+> duyệt hoặc đổi máy là mất vĩnh viễn. **Đừng nhập dữ liệu gia phả thật trước khi `IO-001`
+> (xuất/nhập Native JSON) hoàn thành** — xem [`.docs/v0.2/tasks.md`](.docs/v0.2/tasks.md).
+
+Deploy production còn bị chặn riêng: xem `OPS-002` trong cùng file.
 
 ## MVP đang xây
 

@@ -129,6 +129,44 @@ mất row**.
 
 ---
 
+## 6. Phạm vi mốc hiện tại: một người dùng, máy của chính họ, dữ liệu thật
+
+**Ngày:** 2026-08-22 · **Nguồn:** chủ dự án xác nhận trực tiếp
+
+Câu "đủ để dùng chưa" không trả lời được nếu không biết ai dùng. Bốn điều đã chốt:
+
+| | |
+|---|---|
+| Ai dùng | **chỉ chủ dự án**, không phát cho ai |
+| Mở app thế nào | trên **máy của chính họ**, qua `pnpm dev` / `pnpm start` |
+| Dữ liệu | **thật**, và sẽ nhập nhiều |
+| Quy mô | **vài chục đến vài trăm người** |
+
+Đây là phạm vi của **mốc hiện tại**, không phải từ bỏ tầm nhìn sản phẩm trong
+`.docs/v0.2/brief.md` (vẫn là `TARGET`: web công khai, người dùng không kỹ thuật).
+
+**Bốn hệ quả:**
+
+1. **Xuất dữ liệu ra file thành việc CHẶN.** Dữ liệu thật vào một trình duyệt không có đường
+   lấy ra là đường mất dữ liệu duy nhất còn mở, và gia phả là dữ liệu **không tái tạo được**.
+   `IO-001` nâng P2 → **P0**. Đáng lưu ý: `brief.md` **vốn đã** xếp import/export vào "core MVP
+   success criteria" — nên P2 mới là chỗ sai, việc nâng lên chỉ là đưa về khớp.
+2. **Hosting và isolation header ra khỏi mốc này.** `sqlite-wasm` cần `SharedArrayBuffer` nên
+   cần COOP/COEP, mà `vite.config.ts` chỉ đặt cho `server`/`preview`. Không ai ngoài chủ dự án
+   mở app nên chưa chặn. Ghi thành `OPS-002` với trạng thái `OUT_OF_SCOPE` — **phải mở lại
+   trước khi đưa link cho bất kỳ ai**, vì thiếu nó app không mở nổi database.
+3. **Mốc 10.000 người hoãn.** Cây thật vài trăm người, nằm gọn trong giới hạn 500 node hiển thị
+   đã có. `PERF-001` → `DEFERRED`. Con số 10.000 vẫn là mục tiêu trong `brief.md`. **Đây là chỗ
+   lệch khỏi brief có chủ đích**, nên ghi rõ ở đây chứ không sửa `brief.md`.
+4. **Chuẩn bị phát hành công khai hoãn.** Không phát hành thì không có gì để chuẩn bị.
+   `REL-001` → `DEFERRED`. Kéo theo: **điều kiện sử dụng thuật toán âm lịch (mục 1 của
+   [`credits.md`](credits.md)) chưa chặn** — nó chỉ chặn khi phát hành công khai.
+
+**Cái gì chứng minh quyết định này sai:** có người thứ hai cần dùng app. Lúc đó `OPS-002`,
+`REL-001` và câu hỏi license âm lịch quay lại cùng lúc.
+
+---
+
 ## Câu chưa trả lời được
 
 1. `docs/` (nhánh cũ) và `.docs/` (nền hiện tại, snapshot theo version) đang cùng

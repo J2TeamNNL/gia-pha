@@ -21,6 +21,19 @@ Two things in `credits.md` constrain what you may do: the lunar algorithm in
 **unverified**, and the three projects cloned into `references/` carry no LICENSE, so they may
 be read but never copied from.
 
+## Current milestone scope
+
+One user — the owner — on their own machine, entering **real** family data, a tree of a few
+hundred people. Nothing is distributed to anyone else.
+
+So: hosting, isolation headers (`OPS-002`), the 10,000-person benchmark (`PERF-001`), and public
+release prep (`REL-001`) do **not** gate this milestone. One thing does — **there is still no way
+to copy a tree out of the browser** (`IO-001`, P0). Real, irreplaceable data in a store with no
+export is the only open data-loss path left. Treat it as the top priority, and don't let a
+request to "add a feature" quietly outrank it.
+
+Recorded with its consequences in `docs/decisions.md` §6.
+
 ## What this is
 
 **Gia Phả** — an open-source, privacy-first family tree application for Vietnamese
