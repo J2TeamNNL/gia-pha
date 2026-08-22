@@ -1,4 +1,4 @@
-export const LATEST_SCHEMA_VERSION = 5;
+export const LATEST_SCHEMA_VERSION = 6;
 
 /** First schema version that has the tree_metadata table to keep in sync. */
 const TREE_METADATA_SINCE_VERSION = 2;
@@ -231,12 +231,46 @@ const BRANCH_PROVINCE_SQL = `
   ALTER TABLE branch_profiles ADD COLUMN province_code TEXT;
 `;
 
+/**
+ * A Vietnamese lunar year inserts a leap month that repeats the previous
+ * month's number. "Tháng 8" and "tháng 8 nhuận" are different months, so a giỗ
+ * recorded without that flag lands on the wrong day in any year that has one.
+ *
+ * The flag arrives as a column plus triggers rather than CHECK constraints:
+ * five foreign keys point at partial_dates with ON DELETE SET NULL, so
+ * rebuilding the table to attach CHECKs would blank every date reference in the
+ * file. ALTER TABLE ADD COLUMN cannot add a CHECK, but a trigger attaches to a
+ * table that already holds data and enforces the same rule.
+ */
+const LUNAR_LEAP_MONTH_SQL = `
+  ALTER TABLE partial_dates ADD COLUMN is_leap_month INTEGER NOT NULL DEFAULT 0;
+
+  CREATE TRIGGER IF NOT EXISTS partial_dates_leap_month_insert
+  BEFORE INSERT ON partial_dates
+  WHEN NEW.is_leap_month NOT IN (0, 1)
+    OR (NEW.is_leap_month = 1 AND NEW.calendar <> 'LUNAR')
+    OR (NEW.calendar = 'LUNAR' AND NEW.day IS NOT NULL AND NEW.day > 30)
+  BEGIN
+    SELECT RAISE(ABORT, 'A leap month belongs to a lunar date, and a lunar month has at most 30 days');
+  END;
+
+  CREATE TRIGGER IF NOT EXISTS partial_dates_leap_month_update
+  BEFORE UPDATE ON partial_dates
+  WHEN NEW.is_leap_month NOT IN (0, 1)
+    OR (NEW.is_leap_month = 1 AND NEW.calendar <> 'LUNAR')
+    OR (NEW.calendar = 'LUNAR' AND NEW.day IS NOT NULL AND NEW.day > 30)
+  BEGIN
+    SELECT RAISE(ABORT, 'A leap month belongs to a lunar date, and a lunar month has at most 30 days');
+  END;
+`;
+
 export const SCHEMA_MIGRATIONS: readonly SchemaMigration[] = [
   { version: 1, description: "Preserve prototype people and relationships", sql: INITIAL_SCHEMA_SQL },
   { version: 2, description: "Add versioned genealogy domain tables", sql: DOMAIN_SCHEMA_SQL },
   { version: 3, description: "Index relationships by person for deletes and traversal", sql: RELATIONSHIP_INDEXES_SQL },
   { version: 4, description: "Add xưng hô branch profiles and membership links", sql: BRANCH_PROFILES_SCHEMA_SQL },
   { version: 5, description: "Let a branch select a provincial dialect variant", sql: BRANCH_PROVINCE_SQL },
+  { version: 6, description: "Record whether a lunar date falls in a leap month", sql: LUNAR_LEAP_MONTH_SQL },
 ];
 
 export function migrationsAfter(version: number): readonly SchemaMigration[] {
