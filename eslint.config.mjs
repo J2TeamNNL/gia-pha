@@ -24,4 +24,19 @@ export default tseslint.config(
     plugins: { "react-hooks": reactHooks },
     rules: reactHooks.configs.recommended.rules,
   },
+  {
+    // The service worker runs in ServiceWorkerGlobalScope, not the window, so
+    // its globals have to be named for the default browser environment.
+    files: ["public/sw.js"],
+    languageOptions: {
+      globals: {
+        self: "readonly",
+        caches: "readonly",
+        fetch: "readonly",
+        URL: "readonly",
+        Promise: "readonly",
+        console: "readonly",
+      },
+    },
+  },
 );
